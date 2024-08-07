@@ -79,7 +79,8 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
           <SidenavCollapse name={name} icon={icon} active={key === collapseName} />
         </NavLink>
       );
-    } else if (type === "title") {
+    }
+     else if (type === "title") {
       returnValue = (
         <MDTypography
           key={key}
@@ -96,7 +97,8 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
           {title}
         </MDTypography>
       );
-    } else if (type === "divider") {
+    } 
+    else if (type === "divider") {
       returnValue = (
         <Divider
           key={key}
