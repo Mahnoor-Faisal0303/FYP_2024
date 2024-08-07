@@ -35,13 +35,33 @@ import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 import Projects from "layouts/dashboard/components/Projects";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 
+import Card from "components/Card";
+import Task from "components/Task";
+import { Typography, Box } from "@mui/material";
+
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
 
   return (
     <DashboardLayout>
-      <DashboardNavbar />
-      <MDBox py={3}>
+      <Box>
+      <DashboardNavbar /></Box>
+        <Typography variant="h3" sx={{ml:"2%"}}>Welcome To NLP TaskPRO Dashboards</Typography>
+      <Box display="flex">
+      <Card height="180px" width="200px">
+        <Task heading="In Progress" subheading="task in progress"/>
+      </Card>
+      <Card height="180px" width="200px">
+      <Task heading="Unassigned" subheading="tasks"/>
+      </Card>
+      <Card height="180px" width="200px">
+      <Task heading="Completed" subheading="task"/>
+      </Card>
+      <Card height="180px" width="270px">
+      <Task heading="Task completed this week" subheading="completed"/>
+      </Card>
+      </Box>
+      {/* <MDBox py={3}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
@@ -154,8 +174,8 @@ function Dashboard() {
             </Grid>
           </Grid>
         </MDBox>
-      </MDBox>
-      <Footer />
+      </MDBox> */}
+      {/* <Footer /> */}
     </DashboardLayout>
   );
 }

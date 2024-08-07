@@ -1,54 +1,52 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 import { useState } from "react";
-
-// react-router-dom components
 import { Link } from "react-router-dom";
-
-// @mui material components
+import { useForm, SubmitHandler } from "react-hook-form";
 import Card from "@mui/material/Card";
 import Switch from "@mui/material/Switch";
 import Grid from "@mui/material/Grid";
 import MuiLink from "@mui/material/Link";
-
-// @mui icons
 import FacebookIcon from "@mui/icons-material/Facebook";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import GoogleIcon from "@mui/icons-material/Google";
-
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
-
-// Authentication layout components
 import BasicLayout from "layouts/authentication/components/BasicLayout";
-
-// Images
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+import { styled } from "@mui/system";
+import "../sign-up/signUP.css";
+import { Box, TextField, FormControl,InputLabel, InputAdornment, IconButton, OutlinedInput } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+
+const GradientBox = styled(Box)`
+  border: 2px solid transparent;
+  border-radius: 15px;
+  background-image: linear-gradient(white, white), linear-gradient(to right, blue, green, yellow,orange,green);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+`;
 
 function Basic() {
-  const [rememberMe, setRememberMe] = useState(false);
 
+  const [rememberMe, setRememberMe] = useState(false);
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
+
+  const { register, formState: { errors }, handleSubmit } = useForm();
+  const onSubmit = (data) => console.log(data);
+
+  const [showPassword, setShowPassword] = useState(false);
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
 
   return (
     <BasicLayout image={bgImage}>
+      <GradientBox>
       <Card>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <MDBox
           variant="gradient"
           bgColor="info"
@@ -82,12 +80,51 @@ function Basic() {
           </Grid>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
-          <MDBox component="form" role="form">
+          <MDBox>
             <MDBox mb={2}>
-              <MDInput type="email" label="Email" fullWidth />
+            <TextField
+                    {...register("email", {
+                      required: "Email is required",
+                    })}
+                    aria-invalid={errors.email ? "true" : "false"}
+                    sx={{ width: "100%" }}
+                    label="Email"
+                  />
+                  {errors.email?.type === "required" && (
+                    <p className="error" role="alert">
+                      Email is required
+                    </p>
+                  )}
             </MDBox>
             <MDBox mb={2}>
-              <MDInput type="password" label="Password" fullWidth />
+            <FormControl variant="outlined" sx={{ width: "100%" }}>
+                    <InputLabel>Password</InputLabel>
+                    <OutlinedInput
+                      type={showPassword ? "password" : "text"}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                      {...register("password", {
+                        required: "Password is required",
+                      })}
+                      aria-invalid={errors.password ? "true" : "false"}
+                      label="Password"
+                    />
+                    {errors.password?.type === "required" && (
+                      <p className="error" role="alert">
+                        Password is required
+                      </p>
+                    )}
+                  </FormControl>
             </MDBox>
             <MDBox display="flex" alignItems="center" ml={-1}>
               <Switch checked={rememberMe} onChange={handleSetRememberMe} />
@@ -102,7 +139,7 @@ function Basic() {
               </MDTypography>
             </MDBox>
             <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth>
+              <MDButton variant="gradient" color="info" fullWidth type="submit">
                 sign in
               </MDButton>
             </MDBox>
@@ -123,7 +160,9 @@ function Basic() {
             </MDBox>
           </MDBox>
         </MDBox>
+        </form>
       </Card>
+      </GradientBox>
     </BasicLayout>
   );
 }
