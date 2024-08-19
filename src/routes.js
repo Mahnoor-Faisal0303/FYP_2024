@@ -7,6 +7,7 @@ import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import Icon from "@mui/material/Icon";
+import TaskAssign from "layouts/taskassign";
 
 const routes = [
   {
@@ -16,6 +17,14 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
+  },
+  {
+    type: "collapse",
+    name: "TaskAssign",
+    key: "taskassign",
+    //icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/taskassign",
+    component: <TaskAssign />,
   },
   {
     type: "collapse",

@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { database } from "../FirebaseConfig";
+import { createUserWithEmailAndPassword,signInWithEmailAndPassword,getAuth ,signOut} from "firebase/auth"
 import { useForm, SubmitHandler } from "react-hook-form";
 import Card from "@mui/material/Card";
 import Switch from "@mui/material/Switch";
@@ -29,11 +31,29 @@ const GradientBox = styled(Box)`
 
 function Basic() {
 
+  const navigate = useNavigate();
+  const auth = getAuth();
+
   const [rememberMe, setRememberMe] = useState(false);
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
 
   const { register, formState: { errors }, handleSubmit } = useForm();
-  const onSubmit = (data) => console.log(data);
+  // const onSubmit = (data) => console.log(data);
+
+  const onSubmit = (data) =>{
+  signInWithEmailAndPassword(auth, data.email, data.password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            console.log(user);
+            navigate("/home");
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.log(errorCode, errorMessage);
+        });
+      }
+
 
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => setShowPassword((show) => !show);

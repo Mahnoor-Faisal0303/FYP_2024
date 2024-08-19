@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { database } from "../FirebaseConfig";
+import { createUserWithEmailAndPassword, sendEmailVerification, getAuth } from "firebase/auth";
 import Card from "@mui/material/Card";
 import Checkbox from "@mui/material/Checkbox";
 import MDBox from "components/MDBox";
@@ -38,8 +40,21 @@ function Cover() {
     formState: { errors },
     handleSubmit,
   } = useForm();
+  const auth = getAuth();
+  const navigate = useNavigate();
+  //const onSubmit = (data) => console.log(data);
+  const onSubmit = (data) => {
+    const email = data.email;
+    const password = data.password;
 
-  const onSubmit = (data) => console.log(data);
+    createUserWithEmailAndPassword(database, email, password).then((data) => {
+      console.log(data, "authData");
+      sendEmailVerification(auth.currentUser).then(() => {
+        alert("email sent! please verify...");
+        navigate('/authentication/sign-in');
+      });
+    });
+  };
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -192,25 +207,25 @@ function Cover() {
                   </p>
                 )}
                 <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth type="submit">
-                sign in
-              </MDButton>
-            </MDBox>
-            <MDBox mt={3} mb={1} textAlign="center">
-              <MDTypography variant="button" color="text">
-                Already have an account?{" "}
-                <MDTypography
-                  component={Link}
-                  to="/authentication/sign-in"
-                  variant="button"
-                  color="info"
-                  fontWeight="medium"
-                  textGradient
-                >
-                  Sign In
-                </MDTypography>
-              </MDTypography>
-            </MDBox>
+                  <MDButton variant="gradient" color="info" fullWidth type="submit">
+                    sign Up
+                  </MDButton>
+                </MDBox>
+                <MDBox mt={3} mb={1} textAlign="center">
+                  <MDTypography variant="button" color="text">
+                    Already have an account?{" "}
+                    <MDTypography
+                      component={Link}
+                      to="/authentication/sign-in"
+                      variant="button"
+                      color="info"
+                      fontWeight="medium"
+                      textGradient
+                    >
+                      Sign In
+                    </MDTypography>
+                  </MDTypography>
+                </MDBox>
               </MDBox>
             </MDBox>
           </form>
