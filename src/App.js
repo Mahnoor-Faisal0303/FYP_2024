@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useState, useEffect, useMemo } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
@@ -17,8 +18,21 @@ import routes from "routes";
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
 import brandWhite from "assets/images/logo-ct.png";
 import brandDark from "assets/images/logo-ct-dark.png";
+import { Button, Box } from "@mui/material";
+import Typography from "@mui/material/Typography";
+import Modal from "@mui/material/Modal";
+import TaskAssign from "../src/components/DialogBox";
+import MicIcon from "@mui/icons-material/Mic";
+import KeyboardVoiceOutlinedIcon from "@mui/icons-material/KeyboardVoiceOutlined";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function App() {
+  // const [modalOpen , setModalOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
   const [controller, dispatch] = useMaterialUIController();
   const {
     miniSidenav,
@@ -81,7 +95,8 @@ export default function App() {
     });
 
   const configsButton = (
-    <MDBox
+    <>
+      {/* <MDBox
       display="flex"
       justifyContent="center"
       alignItems="center"
@@ -101,7 +116,27 @@ export default function App() {
       <Icon fontSize="small" color="inherit">
         settings
       </Icon>
-    </MDBox>
+    </MDBox> */}
+      <MDBox
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        width="2.4rem"
+        height="2.4rem"
+        bgColor="white"
+        shadow="sm"
+        borderRadius="50%"
+        position="fixed"
+        right="1rem"
+        bottom="3rem"
+        zIndex={99}
+        color="dark"
+        sx={{ cursor: "pointer", marginRight: "70px", border: "3px solid blue" }}
+      >
+        <KeyboardVoiceOutlinedIcon onClick={handleOpen} />
+      </MDBox>
+      <TaskAssign open={open} handleClose={handleClose} />
+    </>
   );
 
   return direction === "rtl" ? (
@@ -127,6 +162,10 @@ export default function App() {
           {getRoutes(routes)}
           <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
+        <div>
+          <button onClick={notify}>Notify!</button>
+          <ToastContainer />
+        </div>
       </ThemeProvider>
     </CacheProvider>
   ) : (
@@ -151,6 +190,18 @@ export default function App() {
         {getRoutes(routes)}
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
     </ThemeProvider>
   );
 }

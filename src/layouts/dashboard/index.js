@@ -16,23 +16,9 @@ import Card from "components/Card";
 import Task from "components/Task";
 import { Typography, Box,IconButton } from "@mui/material";
 import MicIcon from '@mui/icons-material/Mic';
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
-
-  const {
-    transcript,
-    listening,
-    resetTranscript,
-    browserSupportsSpeechRecognition
-  } = useSpeechRecognition();
-  console.log(transcript);
-  console.log(listening);
-
-  // if (!browserSupportsSpeechRecognition) {
-  //   return <span>Browser doesn't support speech recognition.</span>;
-  // }
 
   return (
     <DashboardLayout>
@@ -53,19 +39,6 @@ function Dashboard() {
       <Task heading="Task completed this week" subheading="completed"/>
       </Card>
       </Box>
-      <Box>
-      <Typography>Microphone: {listening ? 'on' : 'off'}</Typography>
-      {/* <button
-        onTouchStart={SpeechRecognition.startListening}
-        onMouseDown={SpeechRecognition.startListening}
-        onTouchEnd={SpeechRecognition.stopListening}
-        onMouseUp={SpeechRecognition.stopListening}
-      >Hold to talk</button> */}
-      <IconButton onClick={SpeechRecognition.startListening} sx={{background:"blue",color:"#ffff",borderRadius:"0px",margin:"5px"}}>Start <MicIcon /></IconButton>
-      <IconButton onClick={resetTranscript} sx={{background:"blue",color:"#ffff",borderRadius:"0px",margin:"5px"}}>Reset</IconButton>
-      <IconButton onClick={SpeechRecognition.stopListening} sx={{background:"blue",color:"#ffff",borderRadius:"0px",margin:"5px"}}>Stop <MicIcon /></IconButton>
-      <Typography>{transcript}</Typography>
-    </Box>
 
       {/* <MDBox py={3}>
         <Grid container spacing={3}>
