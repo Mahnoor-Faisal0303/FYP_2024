@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { database } from "../FirebaseConfig";
+import { appAuth,db } from "../FirebaseConfig";
 import { createUserWithEmailAndPassword, sendEmailVerification, getAuth } from "firebase/auth";
 import Card from "@mui/material/Card";
 import Checkbox from "@mui/material/Checkbox";
@@ -26,6 +26,8 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { styled } from "@mui/system";
 import "./signUP.css";
 
+import { collection, addDoc } from "firebase/firestore";
+
 const GradientBox = styled(Box)`
   border: 2px solid transparent;
   border-radius: 15px;
@@ -46,12 +48,25 @@ function Cover() {
   const onSubmit = (data) => {
     const email = data.email;
     const password = data.password;
+    const name = data.name;
 
-    createUserWithEmailAndPassword(database, email, password).then((data) => {
-      console.log(data, "authData");
-      sendEmailVerification(auth.currentUser).then(() => {
+    createUserWithEmailAndPassword(appAuth, email, password).then((data) => {
+      console.log(auth.currentUser);
+      sendEmailVerification(auth.currentUser).then(async () => {
+        try {
+          const docRef = await addDoc(collection(db, "users"), {
+            email: email,
+            name: name,
+            uid: auth.currentUser.uid,
+          });
+          console.log("Document written with ID: ", docRef.id);
+        } 
+        catch (e) {
+          console.error("Error adding document: ", e);
+        }
+
         alert("email sent! please verify...");
-        navigate('/authentication/sign-in');
+        navigate("/authentication/sign-in");
       });
     });
   };

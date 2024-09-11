@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { database } from "../FirebaseConfig";
 import { createUserWithEmailAndPassword,signInWithEmailAndPassword,getAuth ,signOut} from "firebase/auth"
 import { useForm, SubmitHandler } from "react-hook-form";
 import Card from "@mui/material/Card";

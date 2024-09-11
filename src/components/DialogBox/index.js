@@ -12,6 +12,9 @@ import Modal from '@mui/material/Modal';
 import PropTypes from 'prop-types';
 import { toast } from "react-toastify";
 
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../../layouts/authentication/FirebaseConfig";
+
 const TaskAssign = ({open , handleClose}) =>{
   const { transcript, listening, resetTranscript } =
     useSpeechRecognition();
@@ -66,6 +69,21 @@ phrase is "${speechString}"`
   const speechRecognize = () => {
     SpeechRecognition.startListening({ continuous: true });
   };
+
+  const createTask = async() =>{
+    try {
+      const docRef = await addDoc(collection(db, "tasks"), {
+        title: title,
+        description: description,
+        assignee: assignee,
+        status: "todo"
+      });
+      console.log("Document written with ID: ", docRef.id);
+    } 
+    catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  }
 
   useEffect(() => {
     setSpeechString(transcript);
@@ -176,12 +194,12 @@ phrase is "${speechString}"`
               <span style={{ textDecoration: "underline" }}>Assignee</span>{" "}:{" "}{assignee}
             </Typography>
             }
-            <Box
-              sx={{ width: "5%", cursor: "pointer", alignSelf: "end", m: "10px" }}
-              onClick={() => setShowCard(true)}
+            <Button
+              sx={{ cursor: "pointer", alignSelf: "end", m: "10px"}}
+              onClick={createTask}
             >
-              <SendIcon />
-            </Box>
+              Create Task
+            </Button>
           </Box>
         )}
       </Box>
