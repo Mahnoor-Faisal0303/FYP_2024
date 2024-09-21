@@ -5,16 +5,16 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import { Typography, Box, IconButton, Input, TextField, Button } from "@mui/material";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { collection, getDocs } from "firebase/firestore"; 
-import {db} from "../authentication/FirebaseConfig";
+import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
+import { db } from "../authentication/FirebaseConfig";
 
-function Billing() {
-  const [todos,setTodos] = useState([]);
-  const [progress] = useState(["Taska", "Taskb"]);
-  const [testing]= useState(["task f", "task l"]);
-  const [done]= useState(["task z", "task y"]);
+function TaskList() {
+  const [todos, setTodos] = useState([]);
+  const [progress, setProgress] = useState([]);
+  const [testing, setTesting] = useState([]);
+  const [done, setDone] = useState([]);
 
-  const handleOnDragEnd = (result) => {
+  const handleOnDragEnd = async (result) => {
     if (!result.destination) return;
 
     if (result.source.droppableId === "todo") {
@@ -25,6 +25,12 @@ function Billing() {
       if (result.destination.droppableId === "inprogress") {
         const [removed] = todos.splice(result.source.index, 1);
         progress.splice(result.destination.index, 0, removed);
+
+        const docRef = doc(db, "tasks", removed.id);
+
+        await updateDoc(docRef, {
+          status: "inprogress",
+        });
       }
     }
 
@@ -36,6 +42,12 @@ function Billing() {
       if (result.destination.droppableId === "testing") {
         const [removed] = progress.splice(result.source.index, 1);
         testing.splice(result.destination.index, 0, removed);
+
+        const docRef = doc(db, "tasks", removed.id);
+
+        await updateDoc(docRef, {
+          status: "testing",
+        });
       }
     }
 
@@ -47,6 +59,12 @@ function Billing() {
       if (result.destination.droppableId === "done") {
         const [removed] = testing.splice(result.source.index, 1);
         done.splice(result.destination.index, 0, removed);
+
+        const docRef = doc(db, "tasks", removed.id);
+
+        await updateDoc(docRef, {
+          status: "done",
+        });
       }
     }
 
@@ -58,23 +76,49 @@ function Billing() {
       if (result.destination.droppableId === "testing") {
         const [removed] = done.splice(result.source.index, 1);
         testing.splice(result.destination.index, 0, removed);
+
+        const docRef = doc(db, "tasks", removed.id);
+
+        await updateDoc(docRef, {
+          status: "testing",
+        });
       }
     }
   };
 
-  useEffect(()=>{
-    const getTask = async() =>{
+  useEffect(() => {
+    todos.splice(0, todos.length);
+    progress.splice(0, progress.length);
+    testing.splice(0, testing.length);
+    done.splice(0, done.length);
+
+    const getTask = async () => {
       const querySnapshot = await getDocs(collection(db, "tasks"));
       setTodos([]);
       querySnapshot.forEach((doc) => {
-        console.log(`${doc.id} => ${doc.data()}`,doc.data());
+        console.log(`${doc.id} => ${doc.data()}`, doc.data());
         let docData = doc.data();
-        todos.push(docData.title);
-      })
+        docData.id = doc.id;
+        if (docData.status === "todo") {
+          todos.push(docData);
+        }
+        if (docData.status === "inprogress") {
+          progress.push(docData);
+        }
+        if (docData.status === "testing") {
+          testing.push(docData);
+        }
+        if (docData.status === "done") {
+          done.push(docData);
+        }
+      });
       setTodos([...todos]);
-    }
+      setProgress([...progress]);
+      setTesting([...testing]);
+      setDone([...done]);
+    };
     getTask();
-  },[])
+  }, []);
 
   return (
     <DashboardLayout>
@@ -90,7 +134,7 @@ function Billing() {
                 {(provided, snapshot) => (
                   <Box ref={provided.innerRef} minHeight={100}>
                     {todos.map((row, i) => (
-                      <Draggable key={todos[i]} draggableId={todos[i]} index={i}>
+                      <Draggable key={todos[i].id} draggableId={todos[i].id} index={i}>
                         {(provided, snapshot) => (
                           <Typography
                             padding={2}
@@ -102,7 +146,7 @@ function Billing() {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                           >
-                            {todos[i]}
+                            {todos[i].title}
                           </Typography>
                         )}
                       </Draggable>
@@ -119,7 +163,7 @@ function Billing() {
                 {(provided, snapshot) => (
                   <Box ref={provided.innerRef} minHeight={100}>
                     {progress.map((row, i) => (
-                      <Draggable key={progress[i]} draggableId={progress[i]} index={i}>
+                      <Draggable key={progress[i].id} draggableId={progress[i].id} index={i}>
                         {(provided, snapshot) => (
                           <Typography
                             padding={2}
@@ -131,7 +175,7 @@ function Billing() {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                           >
-                            {progress[i]}
+                            {progress[i].title}
                           </Typography>
                         )}
                       </Draggable>
@@ -149,20 +193,20 @@ function Billing() {
                 {(provided, snapshot) => (
                   <Box ref={provided.innerRef} minHeight={100}>
                     {testing.map((row, i) => (
-                      <Draggable key={testing[i]} draggableId={testing[i]} index={i}>
+                      <Draggable key={testing[i].id} draggableId={testing[i].id} index={i}>
                         {(provided, snapshot) => (
-                      <Typography
-                        padding={2}
-                        variant="h6"
-                        component="h2"
-                        key={i}
-                        sx={{ background: "#D3A29D", marginBottom: "10px" }}
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        {testing[i]}
-                      </Typography>
+                          <Typography
+                            padding={2}
+                            variant="h6"
+                            component="h2"
+                            key={i}
+                            sx={{ background: "#D3A29D", marginBottom: "10px" }}
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                          >
+                            {testing[i].title}
+                          </Typography>
                         )}
                       </Draggable>
                     ))}
@@ -178,22 +222,22 @@ function Billing() {
                 {(provided, snapshot) => (
                   <Box ref={provided.innerRef} minHeight={100}>
                     {done.map((row, i) => (
-                      <Draggable key={done[i]} draggableId={done[i]} index={i}>
+                      <Draggable key={done[i].id} draggableId={done[i].id} index={i}>
                         {(provided, snapshot) => (
-                      <Typography
-                        padding={2}
-                        variant="h6"
-                        component="h2"
-                        key={i}
-                        sx={{ background: "#A36361", marginBottom: "10px" }}
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        {done[i]}
-                      </Typography>
+                          <Typography
+                            padding={2}
+                            variant="h6"
+                            component="h2"
+                            key={i}
+                            sx={{ background: "#A36361", marginBottom: "10px" }}
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                          >
+                            {done[i].title}
+                          </Typography>
                         )}
-                        </Draggable>
+                      </Draggable>
                     ))}
                   </Box>
                 )}
@@ -207,4 +251,4 @@ function Billing() {
   );
 }
 
-export default Billing;
+export default TaskList;

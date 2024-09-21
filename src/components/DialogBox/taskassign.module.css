@@ -1,13 +1,93 @@
 .container {
-  background: linear-gradient(
-    rgb(241, 232, 232),
-    rgba(238, 233, 233, 0.993),
-    rgba(213, 176, 228, 0.726)
-  );
-  height: 80vh;
+  background-color: #f1f1ec;
+  height: 200px;
   width: 70%;
-  margin-left: 15%;
-  margin-top: 5%;
-  padding: 20px;
+  margin-left: 25%;
+  margin-top: 28%;
+  padding: 10px 26px;
+  box-shadow: 4px 4px 4px rgba(100, 100, 99, 0.822);
   border-radius: 14px;
+}
+.headerContainer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+.bodyContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: "100%";
+  border: 1px solid blueviolet;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+.sendIcon {
+  display: flex;
+  justify-content: center;
+  margin-right: 10px;
+  cursor: pointer;
+}
+.footer {
+  width:"100%";
+  display: flex;
+  justify-content: center;
+}
+.mic {
+  position: absolute;
+  z-index: 1;
+}
+.mic::before, .mic::after {
+  content: "";
+  position: absolute;
+  top:32px;
+  left:-10px;
+  border-radius: 100%;
+  box-shadow: 0 0 20px 20px #290f6b;
+}
+
+.mic::before {
+  width: 16px;
+  height: 16px;
+  background-color: #290f6b;
+}
+.mic::after {
+  width: 16px;
+  height: 16px;
+  background-color: #3c296e;
+  animation: circle-size 0.8s linear infinite alternate;
+}
+.micshadow {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  margin-top: 38px;
+  margin-left: 14px;
+  z-index: 0;
+  background-color:transparent;
+  border-radius: 100%;
+  box-shadow:2px -20px 10px 7px #f03ee1, 1px 2px 10px 5px #aab3d2,-1px -0px 30px 5px #5acee3,16px 2px 10px 5px #37b3c9, 1px 1px 12px 5px #f30bf5;
+  animation: shadow-rotate 1.5s linear infinite;
+}
+
+@keyframes circle-size {
+  from {
+    width: 16px;
+    height: 16px;
+  }
+  to {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@keyframes shadow-rotate {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
