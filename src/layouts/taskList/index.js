@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
+import styles from "./modal.module.css";
 import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import { Typography, Box, IconButton, Input, TextField, Button } from "@mui/material";
+import { Typography, Box, Button } from "@mui/material";
+import Modal from "@mui/material/Modal";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import arrowImage from "../../assets/images/icons/arrow_back.svg";
 import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
 import { db } from "../authentication/FirebaseConfig";
 
@@ -13,6 +16,24 @@ function TaskList() {
   const [progress, setProgress] = useState([]);
   const [testing, setTesting] = useState([]);
   const [done, setDone] = useState([]);
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  //sconst handleClose = () => setOpen(false);
+
+  const [id, setId] = useState(null);
+  const [title, setTitle] = useState(null);
+  const [description, setDescription] = useState(null);
+  const [assignee, setAssignee] = useState(null);
+
+  const handleOpenModal = (id, title, description, assignee) => {
+    setOpen(true);
+    setId(id);
+    setTitle(title);
+    setDescription(description);
+    setAssignee(assignee);
+    console.log("I am id", id, title, description);
+  };
 
   const handleOnDragEnd = async (result) => {
     if (!result.destination) return;
@@ -145,6 +166,14 @@ function TaskList() {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
+                            onClick={() =>
+                              handleOpenModal(
+                                todos[i].id,
+                                todos[i].title,
+                                todos[i].description,
+                                todos[i].assignee
+                              )
+                            }
                           >
                             {todos[i].title}
                           </Typography>
@@ -174,6 +203,14 @@ function TaskList() {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
+                            onClick={() =>
+                              handleOpenModal(
+                                progress[i].id,
+                                progress[i].title,
+                                progress[i].description,
+                                progress[i].assignee
+                              )
+                            }
                           >
                             {progress[i].title}
                           </Typography>
@@ -204,6 +241,14 @@ function TaskList() {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
+                            onClick={() =>
+                              handleOpenModal(
+                                testing[i].id,
+                                testing[i].title,
+                                testing[i].description,
+                                testing[i].assignee
+                              )
+                            }
                           >
                             {testing[i].title}
                           </Typography>
@@ -233,6 +278,14 @@ function TaskList() {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
+                            onClick={() =>
+                              handleOpenModal(
+                                done[i].id,
+                                done[i].title,
+                                done[i].description,
+                                done[i].assignee
+                              )
+                            }
                           >
                             {done[i].title}
                           </Typography>
@@ -247,6 +300,31 @@ function TaskList() {
         </DragDropContext>
       </MDBox>
       <Footer />
+      <Button onClick={handleOpen}>Open modal</Button>
+      <Modal
+        open={open}
+        //onClose={handleClose}
+      >
+        <Box className={styles.modal_container}>
+          <Box className={styles.modal}>
+            <img
+              src={arrowImage}
+              alt="arrow"
+              className={styles.arrow}
+              onClick={() => setOpen(false)}
+            />
+            <Typography className={styles.modal_child}>
+              Title: <span className={styles.black}> {title}</span>
+            </Typography>
+            <Typography className={styles.modal_child}>
+              Description: <span className={styles.black}>{description}</span>
+            </Typography>
+            <Typography className={styles.modal_child}>
+              Assignee: <span className={styles.black}>{assignee}</span>
+            </Typography>
+          </Box>
+        </Box>
+      </Modal>
     </DashboardLayout>
   );
 }

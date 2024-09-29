@@ -1,17 +1,15 @@
-import { Typography, Box, IconButton, Input, TextField, Button } from "@mui/material";
-import MicIcon from "@mui/icons-material/Mic";
+import { Typography, Box, IconButton, TextField, Button } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PauseCircleIcon from "@mui/icons-material/PauseCircle";
 import SendIcon from "@mui/icons-material/Send";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import styles from "./taskassign.module.css";
 import Modal from "@mui/material/Modal";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
-import micImage from '../../assets/images/icons/flags/mic.png';
+import micImage from "../../assets/images/icons/flags/mic.png";
 
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../../layouts/authentication/FirebaseConfig";
@@ -89,121 +87,6 @@ phrase is "${speechString}"`;
   }, [transcript]);
 
   return (
-    // <Modal
-    //     open={open}
-    //     onClose={handleClose}
-    //     aria-labelledby="modal-modal-title"
-    //     aria-describedby="modal-modal-description"
-    //   >
-    // <Box className={styles.container}>
-    //   <Button onClick={handleClose} sx={{ml:"820px"}}>close</Button>
-    //   <Typography variant="h3" sx={{ ml: "2%" }}>
-    //     Please Assign A Task Here!
-    //   </Typography>
-    //   <Box sx={{ display: "flex", flexDirection: "row" }}>
-    //     <Box
-    //       sx={{
-    //         border: "1px solid black",
-    //         borderRadius: "10px",
-    //         display: "flex",
-    //         //justifyContent: "center",
-    //         width: "50%",
-    //         flexDirection: "column",
-    //         mt: "10px",
-    //       }}
-    //     >
-    //       <Box
-    //         sx={{
-    //           display: "flex",
-    //           justifyContent: "space-between",
-    //           alignSelf: "center",
-    //           width: "95%",
-    //         }}
-    //       >
-    //         <Typography fontSize={15}>Microphone: {listening ? "on" : "off"}</Typography>
-    //         <Box>
-    //           <IconButton onClick={resetTranscript}>
-    //             <DeleteIcon />
-    //           </IconButton>
-    //           <IconButton onClick={SpeechRecognition.stopListening}>
-    //             <PauseCircleIcon />
-    //           </IconButton>
-    //           <IconButton onClick={speechRecognize}>
-    //             <MicIcon />
-    //           </IconButton>
-    //         </Box>
-    //       </Box>
-    //       <Box sx={{ display: "flex", width: "90%", alignSelf: "center", color: "blue" }}>
-    //         <Typography sx={{ mr: "5px" }}>Text:</Typography>
-    //         <TextField
-    //           value={speechString}
-    //           onChange={(event) => setSpeechString(event.target.value)}
-    //           multiline
-    //           rows={6}
-    //           fullWidth={true}
-    //           sx={{"& fieldset": { border: 'none' },margin:"-6px"}}
-    //         />
-    //       </Box>
-    //       {speechString  && (
-    //         <Box
-    //           sx={{
-    //             display: "flex",
-    //             justifyContent: "end",
-    //             width: "5%",
-    //             alignSelf: "end",
-    //             mb: "5px",
-    //             mr: "16px",
-    //             cursor: "pointer",
-    //           }}
-    //           onClick={send}
-    //         >
-    //           <SendIcon />
-    //         </Box>
-    //       )}
-    //     </Box>
-    //     {showCard && title &&(
-    //       <Box
-    //         sx={{
-    //           width: "40%",
-    //           ml: "5%",
-    //           background: "#e1e8e8",
-    //           display: "flex",
-    //           padding:"10px",
-    //           justifyContent: "center",
-    //           flexDirection: "column",
-    //           boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)"
-    //         }}
-    //       >
-    //         <Box
-    //           sx={{ width: "5%", cursor: "pointer", alignSelf: "end", m: "10px" }}
-    //           onClick={() => setShowCard(false)}
-    //         >
-    //           <DeleteIcon />
-    //         </Box>
-    //         <Typography sx={{ m: "5px" }}>
-    //           <span style={{ textDecoration: "underline" }}>Title</span>{" "}:{" "}{title}
-    //         </Typography>
-    //         {description &&
-    //         <Typography sx={{ m: "5px" }}>
-    //           <span style={{ textDecoration: "underline" }}>Description</span>{" "}:{" "}{description}
-    //         </Typography>
-    //         }
-    //         {assignee &&
-    //         <Typography sx={{ m: "5px" }}>
-    //           <span style={{ textDecoration: "underline" }}>Assignee</span>{" "}:{" "}{assignee}
-    //         </Typography>
-    //         }
-    //         <Button
-    //           sx={{ cursor: "pointer", alignSelf: "end", m: "10px"}}
-    //           onClick={createTask}
-    //         >
-    //           Create Task
-    //         </Button>
-    //       </Box>
-    //     )}
-    //   </Box>
-    //   </Box>
-    //   </Modal>
     <Modal
       open={open}
       onClose={handleClose}
@@ -211,11 +94,6 @@ phrase is "${speechString}"`;
       aria-describedby="modal-modal-description"
     >
       <Box className={styles.container}>
-        {/* <Button onClick={handleClose} sx={{ml:"820px"}}>close</Button> */}
-        {/* <Typography variant="h3" sx={{ ml: "2%" }}>
-        Please Assign A Task Here!
-      </Typography> */}
-        {/* <Box sx={{ display: "flex", flexDirection: "row" }}> */}
         <Box className={styles.headerContainer}>
           <Typography fontSize={15}>Microphone: {listening ? "on" : "off"}</Typography>
           <Box>
@@ -225,6 +103,9 @@ phrase is "${speechString}"`;
             <IconButton onClick={resetTranscript}>
               <DeleteIcon />
             </IconButton>
+            <Button sx={{ cursor: "pointer", alignSelf: "end" }} onClick={createTask}>
+              Create Task
+            </Button>
           </Box>
         </Box>
         <Box className={styles.bodyContainer}>
@@ -242,8 +123,12 @@ phrase is "${speechString}"`;
         </Box>
         <Box className={styles.footer}>
           <Box className={styles.mic}></Box>
-          <Box onClick={speechRecognize} sx={{zIndex:1,marginTop:"20px"}}>
-          <img src={micImage} alt="mic" style={{ width: '36px', height: '36px',cursor:"pointer"}} />          
+          <Box onClick={speechRecognize} sx={{ zIndex: 1, marginTop: "20px" }}>
+            <img
+              src={micImage}
+              alt="mic"
+              style={{ width: "36px", height: "36px", cursor: "pointer" }}
+            />
           </Box>
           <Box className={styles.micshadow}></Box>
         </Box>

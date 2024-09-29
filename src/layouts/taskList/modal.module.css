@@ -1,0 +1,36 @@
+.modal_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.modal {
+  display: flex;
+  background-color: rgb(228, 231, 238);
+  max-width: 400px;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 10px;
+  flex-direction: column;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.301), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.modal_child {
+  font-size: 20px;
+  font-weight: 800;
+  color: black;
+  margin: 4px;
+}
+.black {
+  color: blue;
+  font-size: 18px;
+}
+.arrow {
+  cursor: pointer;
+  width: 26px;
+  height: 26px;
+  margin-bottom: 15px;
+}
+.arrow:hover {
+  background-color: rgba(0, 0, 255, 0.171);
+  border-radius: 10px;
+}
