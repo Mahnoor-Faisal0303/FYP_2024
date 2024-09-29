@@ -300,7 +300,6 @@ function TaskList() {
         </DragDropContext>
       </MDBox>
       <Footer />
-      <Button onClick={handleOpen}>Open modal</Button>
       <Modal
         open={open}
         //onClose={handleClose}

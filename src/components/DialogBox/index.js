@@ -54,7 +54,9 @@ phrase is "${speechString}"`;
       if (json.error) {
         toast.error(json.error);
       }
-
+      if (json.title !== null) {
+        createTask();
+      }
       setTitle(json.title);
       setDescription(json.description);
       setAssignee(json.assignee);
@@ -103,9 +105,9 @@ phrase is "${speechString}"`;
             <IconButton onClick={resetTranscript}>
               <DeleteIcon />
             </IconButton>
-            <Button sx={{ cursor: "pointer", alignSelf: "end" }} onClick={createTask}>
+            {/* <Button sx={{ cursor: "pointer", alignSelf: "end" }} onClick={createTask}>
               Create Task
-            </Button>
+            </Button> */}
           </Box>
         </Box>
         <Box className={styles.bodyContainer}>
