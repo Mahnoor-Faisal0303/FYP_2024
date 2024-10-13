@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
-import styles from "./modal.module.css";
 import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import { Typography, Box, Button } from "@mui/material";
-import Modal from "@mui/material/Modal";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import arrowImage from "../../assets/images/icons/arrow_back.svg";
+import DetailModal from "./components/DetailModal";
 import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
 import { db } from "../authentication/FirebaseConfig";
+import { onSnapshot } from "firebase/firestore";
 
 function TaskList() {
   const [todos, setTodos] = useState([]);
@@ -18,21 +17,22 @@ function TaskList() {
   const [done, setDone] = useState([]);
 
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  //sconst handleClose = () => setOpen(false);
+  const handleClose = () => setOpen(!open);
 
   const [id, setId] = useState(null);
   const [title, setTitle] = useState(null);
   const [description, setDescription] = useState(null);
   const [assignee, setAssignee] = useState(null);
+  const [status, setStatus] = useState(null);
 
-  const handleOpenModal = (id, title, description, assignee) => {
+  const handleOpenModal = (id, title, description, assignee, status) => {
     setOpen(true);
     setId(id);
     setTitle(title);
     setDescription(description);
     setAssignee(assignee);
-    console.log("I am id", id, title, description);
+    setStatus(status);
+    console.log("I am id", id, title, description, status, "<<");
   };
 
   const handleOnDragEnd = async (result) => {
@@ -108,35 +108,35 @@ function TaskList() {
   };
 
   useEffect(() => {
-    todos.splice(0, todos.length);
-    progress.splice(0, progress.length);
-    testing.splice(0, testing.length);
-    done.splice(0, done.length);
-
-    const getTask = async () => {
-      const querySnapshot = await getDocs(collection(db, "tasks"));
-      setTodos([]);
-      querySnapshot.forEach((doc) => {
-        console.log(`${doc.id} => ${doc.data()}`, doc.data());
-        let docData = doc.data();
-        docData.id = doc.id;
-        if (docData.status === "todo") {
-          todos.push(docData);
-        }
-        if (docData.status === "inprogress") {
-          progress.push(docData);
-        }
-        if (docData.status === "testing") {
-          testing.push(docData);
-        }
-        if (docData.status === "done") {
-          done.push(docData);
-        }
+    const getTask = () => {
+      onSnapshot(collection(db, "tasks"), (querySnapshot) => {
+        todos.splice(0, todos.length);
+        progress.splice(0, progress.length);
+        testing.splice(0, testing.length);
+        done.splice(0, done.length);
+        setTodos([]);
+        querySnapshot.forEach((doc) => {
+          console.log(`${doc.id} => ${doc.data()}`, doc.data());
+          let docData = doc.data();
+          docData.id = doc.id;
+          if (docData.status === "todo") {
+            todos.push(docData);
+          }
+          if (docData.status === "inprogress") {
+            progress.push(docData);
+          }
+          if (docData.status === "testing") {
+            testing.push(docData);
+          }
+          if (docData.status === "done") {
+            done.push(docData);
+          }
+        });
+        setTodos([...todos]);
+        setProgress([...progress]);
+        setTesting([...testing]);
+        setDone([...done]);
       });
-      setTodos([...todos]);
-      setProgress([...progress]);
-      setTesting([...testing]);
-      setDone([...done]);
     };
     getTask();
   }, []);
@@ -149,7 +149,7 @@ function TaskList() {
           <Box display={"flex"} flexDirection={"row"} sx={{ justifyContent: "space-between" }}>
             <Box width={"100%"} padding={2}>
               <Typography variant="h3" component="h2">
-                Todo
+                TODO
               </Typography>
               <Droppable droppableId="todo">
                 {(provided, snapshot) => (
@@ -171,11 +171,12 @@ function TaskList() {
                                 todos[i].id,
                                 todos[i].title,
                                 todos[i].description,
-                                todos[i].assignee
+                                todos[i].assignee,
+                                todos[i].status
                               )
                             }
                           >
-                            {todos[i].title}
+                            {todos[i].title.toUpperCase()}
                           </Typography>
                         )}
                       </Draggable>
@@ -186,7 +187,7 @@ function TaskList() {
             </Box>
             <Box width={"100%"} padding={2}>
               <Typography variant="h3" component="h2">
-                In Progress
+                IN PROGRESS
               </Typography>
               <Droppable droppableId="inprogress">
                 {(provided, snapshot) => (
@@ -208,11 +209,12 @@ function TaskList() {
                                 progress[i].id,
                                 progress[i].title,
                                 progress[i].description,
-                                progress[i].assignee
+                                progress[i].assignee,
+                                progress[i].status
                               )
                             }
                           >
-                            {progress[i].title}
+                            {progress[i].title.toUpperCase()}
                           </Typography>
                         )}
                       </Draggable>
@@ -223,7 +225,7 @@ function TaskList() {
             </Box>
             <Box width={"100%"} padding={2}>
               <Typography variant="h3" component="h2">
-                Testing
+                TESTING
               </Typography>
 
               <Droppable droppableId="testing">
@@ -246,11 +248,12 @@ function TaskList() {
                                 testing[i].id,
                                 testing[i].title,
                                 testing[i].description,
-                                testing[i].assignee
+                                testing[i].assignee,
+                                testing[i].status
                               )
                             }
                           >
-                            {testing[i].title}
+                            {testing[i].title.toUpperCase()}
                           </Typography>
                         )}
                       </Draggable>
@@ -261,7 +264,7 @@ function TaskList() {
             </Box>
             <Box width={"100%"} padding={2}>
               <Typography variant="h3" component="h2">
-                Done
+                DONE
               </Typography>
               <Droppable droppableId="done">
                 {(provided, snapshot) => (
@@ -283,11 +286,12 @@ function TaskList() {
                                 done[i].id,
                                 done[i].title,
                                 done[i].description,
-                                done[i].assignee
+                                done[i].assignee,
+                                done[i].status
                               )
                             }
                           >
-                            {done[i].title}
+                            {done[i].title.toUpperCase()}
                           </Typography>
                         )}
                       </Draggable>
@@ -300,30 +304,7 @@ function TaskList() {
         </DragDropContext>
       </MDBox>
       <Footer />
-      <Modal
-        open={open}
-        //onClose={handleClose}
-      >
-        <Box className={styles.modal_container}>
-          <Box className={styles.modal}>
-            <img
-              src={arrowImage}
-              alt="arrow"
-              className={styles.arrow}
-              onClick={() => setOpen(false)}
-            />
-            <Typography className={styles.modal_child}>
-              Title: <span className={styles.black}> {title}</span>
-            </Typography>
-            <Typography className={styles.modal_child}>
-              Description: <span className={styles.black}>{description}</span>
-            </Typography>
-            <Typography className={styles.modal_child}>
-              Assignee: <span className={styles.black}>{assignee}</span>
-            </Typography>
-          </Box>
-        </Box>
-      </Modal>
+      <DetailModal open={open} onClose={handleClose} title={title} description={description} assignee={assignee} status={status}/>
     </DashboardLayout>
   );
 }
