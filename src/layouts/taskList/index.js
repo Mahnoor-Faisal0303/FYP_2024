@@ -32,7 +32,7 @@ function TaskList() {
     setDescription(description);
     setAssignee(assignee);
     setStatus(status);
-    console.log("I am id", id, title, description, status, "<<");
+    //console.log("I am id", id, title, description, status, "<<");
   };
 
   const handleOnDragEnd = async (result) => {
@@ -144,11 +144,11 @@ function TaskList() {
   return (
     <DashboardLayout>
       <DashboardNavbar absolute isMini />
-      <MDBox mt={8} sx={{ marginBottom: "220px" }}>
+      <MDBox sx={{ marginBottom: "220px",marginTop:"40px" }}>
         <DragDropContext onDragEnd={handleOnDragEnd}>
           <Box display={"flex"} flexDirection={"row"} sx={{ justifyContent: "space-between" }}>
             <Box width={"100%"} padding={2}>
-              <Typography variant="h3" component="h2">
+              <Typography variant="h3" fontFamily="Raleway" fontWeight={600} marginBottom="10px">
                 TODO
               </Typography>
               <Droppable droppableId="todo">
@@ -160,9 +160,10 @@ function TaskList() {
                           <Typography
                             padding={2}
                             variant="h6"
-                            component="h2"
+                            fontFamily="Raleway"
+                            fontWeight={600}
                             key={i}
-                            sx={{ background: "#EECC8c", marginBottom: "10px" }}
+                            sx={{ marginBottom: "10px",borderRadius:"10px",background: 'linear-gradient(#c7e4ed,#a8dded)',boxShadow:'0 4px 10px #c7e4ed' }}
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
@@ -186,7 +187,7 @@ function TaskList() {
               </Droppable>
             </Box>
             <Box width={"100%"} padding={2}>
-              <Typography variant="h3" component="h2">
+              <Typography variant="h3" fontFamily="Raleway" fontWeight={600} marginBottom="10px">
                 IN PROGRESS
               </Typography>
               <Droppable droppableId="inprogress">
@@ -198,9 +199,10 @@ function TaskList() {
                           <Typography
                             padding={2}
                             variant="h6"
-                            component="h2"
+                            fontFamily="Raleway"
+                            fontWeight={600}
                             key={i}
-                            sx={{ background: "#E8B298", marginBottom: "10px" }}
+                            sx={{ marginBottom: "10px",borderRadius:"10px",background: 'linear-gradient(#fcdea4,#ffd791)',boxShadow:'0 4px 10px #fcdea4' }}
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
@@ -224,7 +226,7 @@ function TaskList() {
               </Droppable>
             </Box>
             <Box width={"100%"} padding={2}>
-              <Typography variant="h3" component="h2">
+              <Typography variant="h3" fontFamily="Raleway" fontWeight={600} marginBottom="10px">
                 TESTING
               </Typography>
 
@@ -237,9 +239,10 @@ function TaskList() {
                           <Typography
                             padding={2}
                             variant="h6"
-                            component="h2"
+                            fontFamily="Raleway"
+                            fontWeight={600}
                             key={i}
-                            sx={{ background: "#D3A29D", marginBottom: "10px" }}
+                            sx={{ marginBottom: "10px",borderRadius:"10px",background: 'linear-gradient(#cee9b6,#c1e6a1)',boxShadow:'0 4px 10px #cee9b6' }}
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
@@ -263,7 +266,7 @@ function TaskList() {
               </Droppable>
             </Box>
             <Box width={"100%"} padding={2}>
-              <Typography variant="h3" component="h2">
+              <Typography variant="h3" fontFamily="Raleway" fontWeight={600} marginBottom="10px">
                 DONE
               </Typography>
               <Droppable droppableId="done">
@@ -275,9 +278,10 @@ function TaskList() {
                           <Typography
                             padding={2}
                             variant="h6"
-                            component="h2"
+                            fontFamily="Raleway"
+                            fontWeight={600}
                             key={i}
-                            sx={{ background: "#A36361", marginBottom: "10px" }}
+                            sx={{ marginBottom: "10px",borderRadius:"10px",background: 'linear-gradient(#bec4fa,#b1b8fa)',boxShadow:'0 4px 10px #bec4fa'}}
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
