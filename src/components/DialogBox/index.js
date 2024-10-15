@@ -13,7 +13,7 @@ import micImage from "../../assets/images/icons/flags/mic.png";
 
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../../layouts/authentication/FirebaseConfig";
-import { getDocs, updateDoc, doc } from "firebase/firestore";
+import { getDocs, updateDoc, doc, deleteDoc } from "firebase/firestore";
 
 import DetailModal from "../../layouts/taskList/components/DetailModal";
 
@@ -68,6 +68,11 @@ or if phrase starts with open or show details , then return success json in this
 title :string,
 action:"open"
 }
+or if phrase starts with delete, then return success json in this format:
+{
+title :string,
+action:"delete"
+}
 and if phrase didn't give the title or state then return failure data as:
 {
 error: string
@@ -104,6 +109,10 @@ phrase is "${speechString}"`;
       if (json.action == "open") {
         openTask(json);
       }
+      if (json.action == "delete") {
+        console.log("delter karrrrrrr");
+        deleteTask(json);
+      }
 
     } catch (error) {
       console.log("Something Went Wrong");
@@ -116,6 +125,7 @@ phrase is "${speechString}"`;
   };
 
   const createTask = async (json) => {
+    handleClose();
     try {
       const docRef = await addDoc(collection(db, "tasks"), {
         title: json.title,
@@ -129,6 +139,7 @@ phrase is "${speechString}"`;
     }
   };
   const moveTask = async (json) => {
+    handleClose();
     const querySnapshot = await getDocs(collection(db, "tasks"));
     querySnapshot.forEach(async (document) => {
       if (document.data().title?.toLowerCase() === json.title?.toLowerCase()) {
@@ -142,9 +153,7 @@ phrase is "${speechString}"`;
   const openTask = async (json) => {
     const querySnapshot = await getDocs(collection(db, "tasks"));
     querySnapshot.forEach(async (document) => {
-      console.log("open   for each ..........", document.data());
       if (document.data().title?.toLowerCase() === json.title?.toLowerCase()) {
-        console.log("if ..........", document.data());
         handleOpenModal(
           document.id,
           document.data().title,
@@ -152,6 +161,16 @@ phrase is "${speechString}"`;
           document.data().assignee,
           document.data().status
         )
+      }
+    });
+  };
+  const deleteTask = async (json) => {
+    const querySnapshot = await getDocs(collection(db, "tasks"));
+    querySnapshot.forEach(async (document) => {
+      console.log("delete chl rha", document.data());
+      if (document.data().title?.toLowerCase() === json.title?.toLowerCase()) {
+        handleClose();
+        await deleteDoc(doc(db, "tasks", document.id));
       }
     });
   };

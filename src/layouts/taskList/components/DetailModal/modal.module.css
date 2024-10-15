@@ -46,11 +46,16 @@
 }
 .arrow {
   cursor: pointer;
-  width: 26px;
-  height: 26px;
-  margin-bottom: 15px;
 }
 .arrow:hover {
   background-color: rgba(0, 0, 255, 0.171);
-  border-radius: 10px;
+  border-radius: 14px;
+}
+/* .delete {
+
+} */
+.delete:hover {
+  cursor: pointer;
+  background:#ff383f5b;
+  border-radius:14px
 }

@@ -27,20 +27,20 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Task List",
-    key: "task",
+    name: "Task Board",
+    key: "task board",
     icon: <Icon fontSize="small">receipt_long</Icon>,
     route: "/task",
     component: <TaskList />,
   },
-  {
-    type: "collapse",
-    name: "RTL",
-    key: "rtl",
-    icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
-    route: "/rtl",
-    component: <RTL />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "RTL",
+  //   key: "rtl",
+  //   icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
+  //   route: "/rtl",
+  //   component: <RTL />,
+  // },
   {
     type: "collapse",
     name: "Notifications",
@@ -72,6 +72,14 @@ const routes = [
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/authentication/sign-up",
     component: <SignUp />,
+  },
+  {
+    type: "collapse",
+    name: "Logout",
+    key: "log-out",
+    icon: <Icon fontSize="small">logout</Icon>,
+    // route: "/authentication/sign-up",
+    // component: <SignUp />,
   },
 ];
 

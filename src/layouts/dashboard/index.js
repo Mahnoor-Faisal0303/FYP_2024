@@ -24,12 +24,21 @@ function Dashboard() {
     <DashboardLayout>
       <Box>
       <DashboardNavbar /></Box>
-        <Typography variant="h3" sx={{ml:"2%"}}>Welcome To NLP TaskPRO Dashboards</Typography>
+        <Typography variant="h3" sx={{ml:"2%"}} fontFamily="Raleway">Welcome To NLP TaskPRO Dashboards</Typography>
       <Box display="flex">
-      <Card height="180px" width="200px">
-        <Task heading="In Progress" subheading="task in progress"/>
+      <Card height="80px" width="200px">
+        <Typography variant="h4" fontFamily="Raleway" fontWeight={600}>Inprogress 12 tasks</Typography>
       </Card>
-      <Card height="180px" width="200px">
+      <Card height="80px" width="200px">
+        <Typography variant="h4" fontFamily="Raleway" fontWeight={600}>Unassigned 0 tasks</Typography>
+      </Card>
+      <Card height="80px" width="200px">
+        <Typography variant="h4" fontFamily="Raleway" fontWeight={600}>completed 2 tasks</Typography>
+      </Card>
+      <Card height="80px" width="200px">
+        <Typography variant="h4" fontFamily="Raleway" fontWeight={600}>4 completed tasks this week</Typography>
+      </Card>
+      {/* <Card height="180px" width="200px">
       <Task heading="Unassigned" subheading="tasks"/>
       </Card>
       <Card height="180px" width="200px">
@@ -37,7 +46,7 @@ function Dashboard() {
       </Card>
       <Card height="180px" width="270px">
       <Task heading="Task completed this week" subheading="completed"/>
-      </Card>
+      </Card> */}
       </Box>
 
       {/* <MDBox py={3}>

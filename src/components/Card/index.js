@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 const Card = ({width,height,children}) => {
   return (
     <div style={{
-      backgroundColor: '#dce0e6',
+      // backgroundColor: '#49a3f1',
+      background: 'linear-gradient(195deg,#b4d2fa, #7cc1fc)',
       borderRadius: '10px',
-      padding: '16px',
+      padding: '8px',
       color: 'black',
       height: height,
       margin: '20px',

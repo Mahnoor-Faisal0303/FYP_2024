@@ -3,7 +3,7 @@ import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import { Typography, Box, Button } from "@mui/material";
+import { Typography, Box} from "@mui/material";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import DetailModal from "./components/DetailModal";
 import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
@@ -19,7 +19,7 @@ function TaskList() {
   const [open, setOpen] = useState(false);
   const handleClose = () => setOpen(!open);
 
-  const [id, setId] = useState(null);
+  const [id, setId] = useState();
   const [title, setTitle] = useState(null);
   const [description, setDescription] = useState(null);
   const [assignee, setAssignee] = useState(null);
@@ -32,7 +32,6 @@ function TaskList() {
     setDescription(description);
     setAssignee(assignee);
     setStatus(status);
-    //console.log("I am id", id, title, description, status, "<<");
   };
 
   const handleOnDragEnd = async (result) => {
@@ -144,7 +143,7 @@ function TaskList() {
   return (
     <DashboardLayout>
       <DashboardNavbar absolute isMini />
-      <MDBox sx={{ marginBottom: "220px",marginTop:"40px" }}>
+      <MDBox sx={{ marginBottom: "220px", marginTop: "40px" }}>
         <DragDropContext onDragEnd={handleOnDragEnd}>
           <Box display={"flex"} flexDirection={"row"} sx={{ justifyContent: "space-between" }}>
             <Box width={"100%"} padding={2}>
@@ -163,7 +162,12 @@ function TaskList() {
                             fontFamily="Raleway"
                             fontWeight={600}
                             key={i}
-                            sx={{ marginBottom: "10px",borderRadius:"10px",background: 'linear-gradient(#c7e4ed,#a8dded)',boxShadow:'0 4px 10px #c7e4ed' }}
+                            sx={{
+                              marginBottom: "10px",
+                              borderRadius: "10px",
+                              background: "linear-gradient(#c7e4ed,#a8dded)",
+                              boxShadow: "0 4px 10px #c7e4ed",
+                            }}
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
@@ -202,7 +206,12 @@ function TaskList() {
                             fontFamily="Raleway"
                             fontWeight={600}
                             key={i}
-                            sx={{ marginBottom: "10px",borderRadius:"10px",background: 'linear-gradient(#fcdea4,#ffd791)',boxShadow:'0 4px 10px #fcdea4' }}
+                            sx={{
+                              marginBottom: "10px",
+                              borderRadius: "10px",
+                              background: "linear-gradient(#fcdea4,#ffd791)",
+                              boxShadow: "0 4px 10px #fcdea4",
+                            }}
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
@@ -242,7 +251,12 @@ function TaskList() {
                             fontFamily="Raleway"
                             fontWeight={600}
                             key={i}
-                            sx={{ marginBottom: "10px",borderRadius:"10px",background: 'linear-gradient(#cee9b6,#c1e6a1)',boxShadow:'0 4px 10px #cee9b6' }}
+                            sx={{
+                              marginBottom: "10px",
+                              borderRadius: "10px",
+                              background: "linear-gradient(#cee9b6,#c1e6a1)",
+                              boxShadow: "0 4px 10px #cee9b6",
+                            }}
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
@@ -281,7 +295,12 @@ function TaskList() {
                             fontFamily="Raleway"
                             fontWeight={600}
                             key={i}
-                            sx={{ marginBottom: "10px",borderRadius:"10px",background: 'linear-gradient(#bec4fa,#b1b8fa)',boxShadow:'0 4px 10px #bec4fa'}}
+                            sx={{
+                              marginBottom: "10px",
+                              borderRadius: "10px",
+                              background: "linear-gradient(#bec4fa,#b1b8fa)",
+                              boxShadow: "0 4px 10px #bec4fa",
+                            }}
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
@@ -308,7 +327,15 @@ function TaskList() {
         </DragDropContext>
       </MDBox>
       <Footer />
-      <DetailModal open={open} onClose={handleClose} title={title} description={description} assignee={assignee} status={status}/>
+      <DetailModal
+        open={open}
+        onClose={handleClose}
+        title={title}
+        description={description}
+        assignee={assignee}
+        status={status}
+        id={id}
+      />
     </DashboardLayout>
   );
 }
