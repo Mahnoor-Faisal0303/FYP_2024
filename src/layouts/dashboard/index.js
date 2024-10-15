@@ -1,4 +1,4 @@
-
+import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -14,54 +14,128 @@ import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 
 import Card from "components/Card";
 import Task from "components/Task";
-import { Typography, Box,IconButton } from "@mui/material";
-import MicIcon from '@mui/icons-material/Mic';
+import { Typography, Box, IconButton } from "@mui/material";
+import MicIcon from "@mui/icons-material/Mic";
+import { db } from "../../layouts/authentication/FirebaseConfig";
+import { getDocs, updateDoc, doc, deleteDoc,collection } from "firebase/firestore";
 
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
+  const [totalTask, setTotalTask] = useState(0);
+  const [todoTaskCount, setTodoTaskCount] = useState(0);
+  const [todoTaskPerc, setTodoTaskPerc] = useState(0);
+
+  const [inprogressTaskCount, setInprogressTaskCount] = useState(0);
+  const [inprogressTaskPerc, setInprogressTaskPerc] = useState(0);
+
+  const [testingTaskCount, setTestingTaskCount] = useState(0);
+  const [testingTaskPerc, setTestingTaskPerc] = useState(0);
+
+  const [doneTaskCount, setDoneTaskCount] = useState(0);
+  const [doneTaskPerc, setDoneTaskPerc] = useState(0);
+  
+  console.log("todo",todoTaskCount,"innn",inprogressTaskCount);
+useEffect(()=> {
+  const totalTasks = async() => {
+    const querySnapshot = await getDocs(collection(db, "tasks"));
+    let documentCount = 0; 
+    let todoCount = 0;
+    let inProgressCount = 0;
+    let testingCount = 0;
+    let doneCount = 0;
+
+       querySnapshot.forEach(async(document) => {
+        documentCount += 1;
+        if (document.data().status === "todo") {
+          todoCount += 1;
+        }
+        if (document.data().status === "inprogress") {
+          inProgressCount += 1;
+        }
+        if (document.data().status === "testing") {
+          testingCount += 1;
+        }
+        if (document.data().status === "done") {
+          doneCount += 1;
+        }
+       });
+       let p1 = ((todoCount*100)/documentCount);
+       let p2 = ((inProgressCount*100)/documentCount);
+       let p3 = ((testingCount*100)/documentCount);
+       let p4 = ((doneCount*100)/documentCount);
+
+       setTodoTaskCount(todoCount);
+       setTodoTaskPerc(p1.toFixed(0));
+
+       setTotalTask(documentCount);
+
+       setInprogressTaskCount(inProgressCount);
+       setInprogressTaskPerc(p2.toFixed(0))
+
+       setTestingTaskCount(testingCount);
+       setTestingTaskPerc(p3.toFixed(0));
+
+       setDoneTaskCount(doneCount);
+       setDoneTaskPerc(p4.toFixed(0));
+    }
+    totalTasks();
+}, []);
 
   return (
     <DashboardLayout>
       <Box>
-      <DashboardNavbar /></Box>
-        <Typography variant="h3" sx={{ml:"2%"}} fontFamily="Raleway">Welcome To NLP TaskPRO Dashboards</Typography>
-      <Box display="flex">
-      <Card height="80px" width="200px">
-        <Typography variant="h4" fontFamily="Raleway" fontWeight={600}>Inprogress 12 tasks</Typography>
-      </Card>
-      <Card height="80px" width="200px">
-        <Typography variant="h4" fontFamily="Raleway" fontWeight={600}>Unassigned 0 tasks</Typography>
-      </Card>
-      <Card height="80px" width="200px">
-        <Typography variant="h4" fontFamily="Raleway" fontWeight={600}>completed 2 tasks</Typography>
-      </Card>
-      <Card height="80px" width="200px">
-        <Typography variant="h4" fontFamily="Raleway" fontWeight={600}>4 completed tasks this week</Typography>
-      </Card>
-      {/* <Card height="180px" width="200px">
-      <Task heading="Unassigned" subheading="tasks"/>
-      </Card>
-      <Card height="180px" width="200px">
-      <Task heading="Completed" subheading="task"/>
-      </Card>
-      <Card height="180px" width="270px">
-      <Task heading="Task completed this week" subheading="completed"/>
-      </Card> */}
+        <DashboardNavbar />
       </Box>
+      <Typography variant="h3" sx={{ ml: "2%" }} fontFamily="Raleway">
+        Welcome To NLP TaskPRO Dashboards
+      </Typography>
+      {/* <MDBox>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6} lg={3}>
+            <Card>
+              <Typography variant="h4" fontFamily="Raleway" fontWeight={600}>
+                Inprogress 12 tasks
+              </Typography>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+            <Card height="80px" width="200px">
+              <Typography variant="h4" fontFamily="Raleway" fontWeight={600}>
+                Unassigned 0 tasks
+              </Typography>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+            <Card height="80px" width="200px">
+              <Typography variant="h4" fontFamily="Raleway" fontWeight={600}>
+                completed 2 tasks
+              </Typography>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+            <Card height="80px" width="200px">
+              <Typography variant="h4" fontFamily="Raleway" fontWeight={600}>
+                4 completed tasks this week
+              </Typography>
+            </Card>
+          </Grid>
+        </Grid>
+      </MDBox> */}
 
-      {/* <MDBox py={3}>
+      <MDBox py={6}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
                 color="dark"
-                icon="weekend"
-                title="Bookings"
-                count={281}
+                icon="queue"
+                title="In Queue"
+                count={todoTaskCount}
+                percentage2={12}
                 percentage={{
                   color: "success",
-                  amount: "+55%",
-                  label: "than lask week",
+                  amount: todoTaskPerc,
+                  label: "tasks",
                 }}
               />
             </MDBox>
@@ -70,12 +144,13 @@ function Dashboard() {
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
                 icon="leaderboard"
-                title="Today's Users"
-                count="2,300"
+                title="In Progress"
+                count={inprogressTaskCount}
+                color="primary"
                 percentage={{
                   color: "success",
-                  amount: "+3%",
-                  label: "than last month",
+                  amount: inprogressTaskPerc,
+                  label: "tasks",
                 }}
               />
             </MDBox>
@@ -84,28 +159,28 @@ function Dashboard() {
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
                 color="success"
-                icon="store"
-                title="Revenue"
-                count="34k"
+                icon="dangerous"
+                title="Testing"
+                count={testingTaskCount}
                 percentage={{
                   color: "success",
-                  amount: "+1%",
-                  label: "than yesterday",
+                  amount: testingTaskPerc,
+                  label: "tasks",
                 }}
+                //percentage2={12}
               />
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
-                color="primary"
-                icon="person_add"
-                title="Followers"
-                count="+91"
+                icon="done"
+                title="Done"
+                count={doneTaskCount}
                 percentage={{
                   color: "success",
-                  amount: "",
-                  label: "Just updated",
+                  amount: doneTaskPerc,
+                  label: "tasks",
                 }}
               />
             </MDBox>
@@ -117,9 +192,9 @@ function Dashboard() {
               <MDBox mb={3}>
                 <ReportsBarChart
                   color="info"
-                  title="website views"
-                  description="Last Campaign Performance"
-                  date="campaign sent 2 days ago"
+                  title={`Number of Tasks ${totalTask}`}
+                  description="Total number of tasks assigned this week"
+                  date="updated 2 days ago"
                   chart={reportsBarChartData}
                 />
               </MDBox>
@@ -128,12 +203,8 @@ function Dashboard() {
               <MDBox mb={3}>
                 <ReportsLineChart
                   color="success"
-                  title="daily sales"
-                  description={
-                    <>
-                      (<strong>+15%</strong>) increase in today sales.
-                    </>
-                  }
+                  title="Completed Tasks this month"
+                  description="Completed tasks this month"
                   date="updated 4 min ago"
                   chart={sales}
                 />
@@ -144,7 +215,7 @@ function Dashboard() {
                 <ReportsLineChart
                   color="dark"
                   title="completed tasks"
-                  description="Last Campaign Performance"
+                  description="Total completed tasks"
                   date="just updated"
                   chart={tasks}
                 />
@@ -152,7 +223,7 @@ function Dashboard() {
             </Grid>
           </Grid>
         </MDBox>
-        <MDBox>
+        {/* <MDBox>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={8}>
               <Projects />
@@ -161,8 +232,8 @@ function Dashboard() {
               <OrdersOverview />
             </Grid>
           </Grid>
-        </MDBox>
-      </MDBox> */}
+        </MDBox> */}
+      </MDBox>
       {/* <Footer /> */}
     </DashboardLayout>
   );
