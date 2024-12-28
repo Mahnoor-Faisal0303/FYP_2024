@@ -1,6 +1,7 @@
 import Dashboard from "layouts/dashboard";
 import Tables from "layouts/tables";
 import TaskList from "layouts/taskList";
+import Projects from "layouts/projects";
 import RTL from "layouts/rtl";
 import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
@@ -16,6 +17,14 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
+  },
+  {
+    type: "collapse",
+    name: "Projects",
+    key: "projects",
+    icon: <Icon fontSize="small">folder</Icon>,
+    route: "/projects",
+    component: <Projects />,
   },
   {
     type: "collapse",
