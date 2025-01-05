@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -8,6 +9,7 @@ import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
 import MDButton from "components/MDButton";
 import Icon from "@mui/material/Icon";
+import CreateProjectModal from "./components/CreateProjectModal";
 
 // Data
 import authorsTableData from "layouts/tables/data/authorsTableData";
@@ -16,6 +18,11 @@ import projectsTableData from "layouts/tables/data/projectsTableData";
 function Projects() {
   const { columns, rows } = authorsTableData();
   const { columns: pColumns, rows: pRows } = projectsTableData();
+  const [open, setOpen] = useState(false);
+    const handleClose = () => setOpen(!open);
+    const handleOpenModal = () => {
+      setOpen(true);
+    };
 
   return (
     <DashboardLayout>
@@ -38,7 +45,10 @@ function Projects() {
                 <MDTypography variant="h6" color="white">
                   Projects Table
                 </MDTypography>
-                <MDButton>Create Project <Icon fontSize="large" style={{marginLeft:"10px"}}>add</Icon></MDButton>
+                <MDButton onClick={() =>
+                  handleOpenModal()
+                }>Create Project <Icon fontSize="large" style={{marginLeft:"10px"}}
+                >add</Icon></MDButton>
                 </MDBox>
                 
               </MDBox>
@@ -56,6 +66,10 @@ function Projects() {
         </Grid>
       </MDBox>
       <Footer />
+      <CreateProjectModal
+              open={open}
+              onClose={handleClose}
+            />
     </DashboardLayout>
   );
 }
