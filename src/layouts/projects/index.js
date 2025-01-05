@@ -12,11 +12,9 @@ import Icon from "@mui/material/Icon";
 import CreateProjectModal from "./components/CreateProjectModal";
 
 // Data
-import authorsTableData from "layouts/tables/data/authorsTableData";
-import projectsTableData from "layouts/tables/data/projectsTableData";
+import projectsTableData from "layouts/projects/data/projectsTableData";
 
 function Projects() {
-  const { columns, rows } = authorsTableData();
   const { columns: pColumns, rows: pRows } = projectsTableData();
   const [open, setOpen] = useState(false);
     const handleClose = () => setOpen(!open);

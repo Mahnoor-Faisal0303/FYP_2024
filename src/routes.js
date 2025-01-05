@@ -1,5 +1,5 @@
 import Dashboard from "layouts/dashboard";
-import Tables from "layouts/tables";
+import Authors from "layouts/tables";
 import TaskList from "layouts/taskList";
 import Projects from "layouts/projects";
 import RTL from "layouts/rtl";
@@ -28,11 +28,11 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Tables",
-    key: "tables",
+    name: "Authors",
+    key: "authors",
     icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/tables",
-    component: <Tables />,
+    route: "/authors",
+    component: <Authors />,
   },
   {
     type: "collapse",

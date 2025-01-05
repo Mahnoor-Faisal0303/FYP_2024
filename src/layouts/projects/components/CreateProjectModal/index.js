@@ -12,7 +12,6 @@ import { getDocs, updateDoc, doc, deleteDoc } from "firebase/firestore";
 const CreateProjectModal = (props) => {
   const { open, onClose } = props;
   const [name, setName] = useState("");
-  const [budget, setBudget] = useState(0);
   const [description, setDescription] = useState("");
 
   const clearTask = () => {
@@ -22,7 +21,6 @@ const CreateProjectModal = (props) => {
     try {
       const docRef = await addDoc(collection(db, "project"), {
         name: name,
-        budget: budget,
         description: description,
       });
       onClose();
@@ -59,15 +57,6 @@ const CreateProjectModal = (props) => {
             variant="standard"
             onChange={(event) => setName(event.target.value)}
             fullWidth={true}
-            />
-            <TextField
-            sx={{ marginBottom: "10px" }}
-            type="number"
-            label="Project Budget"
-            id="standard-start-adornment"
-            variant="standard"
-            fullWidth={true}
-            onChange={(event) => setBudget(event.target.value)}
             />
             <TextField
             sx={{marginBottom: "10px" }}
