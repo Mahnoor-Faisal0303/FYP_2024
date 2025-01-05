@@ -167,7 +167,6 @@ phrase is "${speechString}"`;
   const deleteTask = async (json) => {
     const querySnapshot = await getDocs(collection(db, "tasks"));
     querySnapshot.forEach(async (document) => {
-      console.log("delete chl rha", document.data());
       if (document.data().title?.toLowerCase() === json.title?.toLowerCase()) {
         handleClose();
         await deleteDoc(doc(db, "tasks", document.id));

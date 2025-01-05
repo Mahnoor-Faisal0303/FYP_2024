@@ -1,15 +1,34 @@
+import { useEffect, useState } from "react";
 import styles from "./modal.module.css";
 import PropTypes from "prop-types";
 import { Typography, Box ,TextField, Button} from "@mui/material";
 import Modal from "@mui/material/Modal";
 import arrowImage from "../../../../assets/images/icons/arrow_back.svg";
 import MDButton from "components/MDButton";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../../../authentication/FirebaseConfig";
+import { getDocs, updateDoc, doc, deleteDoc } from "firebase/firestore";
 
 const CreateProjectModal = (props) => {
   const { open, onClose } = props;
+  const [name, setName] = useState("");
+  const [budget, setBudget] = useState(0);
+  const [description, setDescription] = useState("");
 
   const clearTask = () => {
     onClose();
+  };
+  const createProject = async () => {
+    try {
+      const docRef = await addDoc(collection(db, "project"), {
+        name: name,
+        budget: budget,
+        description: description,
+      });
+      onClose();
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
   };
 
   return (
@@ -34,27 +53,33 @@ const CreateProjectModal = (props) => {
           </Box>
           <Box>
             <TextField
-            sx={{ width: "100%" , marginBottom: "10px"}}
+            sx={{ marginBottom: "10px"}}
             label="Project Name"
             id="standard-start-adornment"
             variant="standard"
+            onChange={(event) => setName(event.target.value)}
+            fullWidth={true}
             />
             <TextField
-            sx={{ width: "100%", marginBottom: "10px" }}
+            sx={{ marginBottom: "10px" }}
             type="number"
             label="Project Budget"
             id="standard-start-adornment"
             variant="standard"
+            fullWidth={true}
+            onChange={(event) => setBudget(event.target.value)}
             />
             <TextField
-            sx={{ width: "100%", marginBottom: "10px" }}
+            sx={{marginBottom: "10px" }}
             id="standard-multiline-flexible"
             label="Project Discription"
             multiline
             maxRows={4}
             variant="standard"
+            fullWidth={true}
+            onChange={(event) => setDescription(event.target.value)}
            />
-           <MDButton color="primary">Save</MDButton>
+           <MDButton color="primary" onClick={createProject}>Save</MDButton>
            <MDButton color="dark" onClick={clearTask} sx={{marginLeft:"10px"}}>Cancel</MDButton>
           </Box>
         </Box>
