@@ -7,6 +7,7 @@ import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
+import SignOut from "layouts/authentication/sign-out";
 import Icon from "@mui/material/Icon";
 
 const routes = [
@@ -87,8 +88,8 @@ const routes = [
     name: "Logout",
     key: "log-out",
     icon: <Icon fontSize="small">logout</Icon>,
-    // route: "/authentication/sign-up",
-    // component: <SignUp />,
+    route: "/authentication/sign-out",
+    component: <SignOut />,
   },
 ];
 

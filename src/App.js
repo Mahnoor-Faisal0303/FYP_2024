@@ -1,9 +1,9 @@
 import * as React from "react";
 import { useState, useEffect, useMemo } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import Icon from "@mui/material/Icon";
 import MDBox from "components/MDBox";
 import Sidenav from "examples/Sidenav";
 import Configurator from "examples/Configurator";
@@ -26,12 +26,14 @@ import MicIcon from "@mui/icons-material/Mic";
 import KeyboardVoiceOutlinedIcon from "@mui/icons-material/KeyboardVoiceOutlined";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import zIndex from "@mui/material/styles/zIndex";
 
 export default function App() {
   // const [modalOpen , setModalOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [login, setLogin] = useState(null);
 
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -71,6 +73,16 @@ export default function App() {
   };
 
   const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    setLogin(currentUser != null);
+    console.log(auth.currentUser,"i am");
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     document.body.setAttribute("dir", direction);
@@ -143,6 +155,21 @@ export default function App() {
     <CacheProvider value={rtlCache}>
       <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
         <CssBaseline />
+        <>
+  {login == null ? (
+    <Box style={{ width: "100%", height: "100%", background: "red",zIndex:"999"}}>
+    </Box>
+  ) : (
+    <Routes>
+      {getRoutes(routes)}
+      {login ? (
+        <Route path="*" element={<Navigate to="/dashboard" />} />
+      ) : (
+        <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
+      )}
+    </Routes>
+  )}
+</>
         {layout === "dashboard" && (
           <>
             <Sidenav
@@ -157,11 +184,7 @@ export default function App() {
             {configsButton}
           </>
         )}
-        {layout === "vr" && <Configurator />}
-        <Routes>
-          {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/dashboard" />} />
-        </Routes>
+        {layout === "vr" && <Configurator />} 
         <div>
           <button onClick={notify}>Notify!</button>
           <ToastContainer />
@@ -171,6 +194,20 @@ export default function App() {
   ) : (
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
+      <>
+     {login == null ? (
+    <Box style={{ width: "100%", height: "100%", background: "red", zIndex:"999" }}></Box>
+  ) : (
+    <Routes>
+      {getRoutes(routes)}
+      {login ? (
+        <Route path="*" element={<Navigate to="/dashboard" />} />
+      ) : (
+        <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
+      )}
+    </Routes>
+  )}
+</>
       {layout === "dashboard" && (
         <>
           <Sidenav
@@ -186,10 +223,25 @@ export default function App() {
         </>
       )}
       {layout === "vr" && <Configurator />}
-      <Routes>
+
+      {/* <Routes>
         {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
-      </Routes>
+        { login == null ? (
+          <>
+          <Box sx={{width:"100%", height:"100%", background:"red"}}>
+           </Box>
+           </>
+        ) :
+        login ? (
+        <>
+          <Route path="*" element={<Navigate to="/dashboard" />} />
+        </>
+      ) : (
+        <>
+          <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
+        </>
+      )}
+      </Routes> */}
         <ToastContainer
           position="top-right"
           autoClose={5000}
