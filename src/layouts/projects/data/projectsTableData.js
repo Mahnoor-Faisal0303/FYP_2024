@@ -7,11 +7,11 @@ import MDProgress from "components/MDProgress";
 import LogoAsana from "assets/images/small-logos/logo-asana.svg";
 import logoGithub from "assets/images/small-logos/github.svg";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import { IconButton } from "@mui/material";
 
 import { collection, onSnapshot, doc, deleteDoc } from "firebase/firestore";
 import { db } from "../../authentication/FirebaseConfig";
-
 
 export default function data() {
   const [projectData, setProjectData] = useState([]);
@@ -20,8 +20,7 @@ export default function data() {
     const getProjects = onSnapshot(collection(db, "project"), (querySnapshot) => {
       const projects = [];
       querySnapshot.forEach((doc) => {
-       //projects.push(doc.data());
-        projects.push({ id: doc.id, ...doc.data() }); // Include the document ID
+        projects.push({ id: doc.id, ...doc.data() });
       });
       setProjectData(projects);
     });
@@ -45,7 +44,7 @@ export default function data() {
       { Header: "Action",accessor: "action",  align: "center" },
     ],
 
-    rows: projectData.map((project , index) => ({
+    rows: projectData.map((project) => ({
       project: (
       <MDBox display="flex" alignItems="center" lineHeight={1}>
       <MDAvatar src={LogoAsana} name={"hello"} size="sm" variant="rounded" />
@@ -65,9 +64,14 @@ export default function data() {
         </MDTypography>
       ),
       action: (
+        <MDBox>
         <IconButton onClick={() => deleteProject(project.id)}>
               <DeleteIcon />
-            </IconButton>
+        </IconButton>
+        <IconButton>
+        <EditIcon />
+        </IconButton>
+        </MDBox>
         // <MDTypography component="a" variant="button" color="red" fontWeight="medium">
         //  <DeleteIcon />
         // </MDTypography>
@@ -83,6 +87,7 @@ export default function data() {
       //     <Icon>more_vert</Icon>
       //   </MDTypography>
       // ),
+      
     }))
   };
 }
