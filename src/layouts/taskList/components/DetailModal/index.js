@@ -2,7 +2,17 @@ import styles from "./modal.module.css";
 import PropTypes from "prop-types";
 import { Typography, Box, Button, Select, MenuItem, TextField } from "@mui/material";
 import Modal from "@mui/material/Modal";
-import { deleteDoc, doc, collection, onSnapshot, updateDoc, query, where, addDoc, Timestamp } from "firebase/firestore";
+import {
+  deleteDoc,
+  doc,
+  collection,
+  onSnapshot,
+  updateDoc,
+  query,
+  where,
+  addDoc,
+  Timestamp,
+} from "firebase/firestore";
 import { db } from "../../../authentication/FirebaseConfig";
 import arrowImage from "../../../../assets/images/icons/arrow_back.svg";
 import statusImage from "../../../../assets/images/icons/status.svg";
@@ -35,7 +45,6 @@ const DetailModal = (props) => {
 
     const getUsers = () => {
       onSnapshot(collection(db, "users"), (querySnapshot) => {
-
         let usersData = [{ name: "Unassigned" }];
 
         querySnapshot.forEach((doc) => {
@@ -141,7 +150,7 @@ const DetailModal = (props) => {
     <Modal open={open} onClose={onClose}>
       <Box className={styles.modal_container}>
         <Box className={styles.modal}>
-          <Box display={"flex"} justifyContent={"space-between"} marginBottom="10px">
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             <img
               src={arrowImage}
               alt="arrow"
@@ -150,15 +159,130 @@ const DetailModal = (props) => {
               height={30}
               onClick={onClose}
             />
-            <img src={deleteImage} alt="delete" className={styles.delete} width={30} height={30} onClick={deleteTask} />
+            <img
+              src={deleteImage}
+              alt="delete"
+              className={styles.delete}
+              width={30}
+              height={30}
+              onClick={deleteTask}
+            />
           </Box>
-
-          <Box className={styles.modal_heading}>
+          <Box className={styles.parent}>
+            <Box className={styles.scroll}>
+              <Box className={styles.modal_heading}>
+                <Typography variant="h3" className={styles.modal_child}>
+                  {title}
+                </Typography>
+              </Box>
+              <hr style={{ marginTop: "20px" }} />
+              <Box className={styles.modal_detail}>
+                <Typography variant="h4" className={styles.detailH}>
+                  Details
+                </Typography>
+                <Typography className={styles.detail}>{description}</Typography>
+              </Box>
+              <hr style={{ margin: "10px 0" }} />
+              <Box className={styles.commentSection}>
+                <Typography variant="h6">Comments</Typography>
+                <Box display="flex" alignItems="center" marginTop="10px">
+                  <TextField
+                    variant="outlined"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Add a comment..."
+                    multiline
+                    rows={4}
+                    style={{ flexGrow: 1, marginRight: "10px" }}
+                  />
+                  <Button variant="contained" onClick={handleSendComment}>
+                    Send
+                  </Button>
+                </Box>
+                <Box marginTop="10px">
+                  {comments.map((comment) => (
+                    <Box key={comment.id} marginBottom="10px">
+                      <Typography variant="body2">
+                        <strong>{comment.userName}</strong> |{" "}
+                        {comment.timestamp instanceof Timestamp
+                          ? comment.timestamp.toDate().toLocaleString()
+                          : "Invalid date"}
+                      </Typography>
+                      <Typography variant="body1" style={{ marginTop: "5px" }}>
+                        {comment.comment}
+                      </Typography>
+                      <hr style={{ margin: "10px 0" }} />
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            </Box>
+            <Box>
+              <Box
+                className={styles.modal_status}
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <img
+                  src={statusImage}
+                  alt="status"
+                  width={30}
+                  height={30}
+                  style={{ marginRight: "10px", padding: "2px" }}
+                />
+                <Typography width={100} style={{ fontSize: "16px" }}>
+                  Status:{" "}
+                </Typography>
+                <Select
+                  value={selectedStatus}
+                  onChange={handleStatusChange}
+                  style={{ marginLeft: "10px", minWidth: "120px", padding: "6px" }}
+                >
+                  <MenuItem value="todo">Todo</MenuItem>
+                  <MenuItem value="inprogress">In Progress</MenuItem>
+                  <MenuItem value="testing">Testing</MenuItem>
+                  <MenuItem value="done">Done</MenuItem>
+                </Select>
+              </Box>
+              <Box
+                className={styles.modal_status}
+                style={{ display: "flex", alignItems: "center", marginTop: "10px" }}
+              >
+                <img
+                  src={assigneeImage}
+                  alt="status"
+                  width={30}
+                  height={30}
+                  style={{ marginRight: "10px", padding: "2px" }}
+                />
+                <Typography width={100} style={{ fontSize: "16px" }}>
+                  Assignee:
+                </Typography>
+                <Select
+                  value={selectedAssignee}
+                  onChange={handleSelectedAssignee}
+                  className={styles.gap}
+                  style={{
+                    marginLeft: "10px",
+                    minWidth: "120px",
+                    textTransform: "none",
+                    padding: "6px",
+                  }}
+                >
+                  {users.map((user, index) => (
+                    <MenuItem key={index} value={user.name}>
+                      {user.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Box>
+            </Box>
+          </Box>
+          {/* <Box className={styles.modal_heading}>
             <Typography variant="h3" className={styles.modal_child}>
               {title}
             </Typography>
-          </Box>
-          <Box className={styles.modal_status} style={{ display: "flex", alignItems: "center" }}>
+          </Box> */}
+          {/* <Box className={styles.modal_status} style={{ display: "flex", alignItems: "center" }}>
             <img
               src={statusImage}
               alt="status"
@@ -204,15 +328,15 @@ const DetailModal = (props) => {
                 </MenuItem>
               ))}
             </Select>
-          </Box>
-          <hr style={{ marginTop: "20px" }} />
+          </Box> */}
+          {/* <hr style={{ marginTop: "20px" }} />
           <Box className={styles.modal_detail}>
             <Typography variant="h4" className={styles.detailH}>
               Details
             </Typography>
             <Typography className={styles.detail}>{description}</Typography>
-          </Box>
-          <hr style={{ margin: "10px 0" }} />
+          </Box> */}
+          {/* <hr style={{ margin: "10px 0" }} />
           <Box className={styles.commentSection}>
             <Typography variant="h6">Comments</Typography>
             <Box display="flex" alignItems="center" marginTop="10px">
@@ -222,7 +346,7 @@ const DetailModal = (props) => {
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Add a comment..."
                 multiline
-                rows={4} // Set the number of rows for the TextField
+                rows={4}
                 style={{ flexGrow: 1, marginRight: "10px" }}
               />
               <Button variant="contained" onClick={handleSendComment}>
@@ -235,17 +359,17 @@ const DetailModal = (props) => {
                   <Typography variant="body2">
                     <strong>{comment.userName}</strong> |{" "}
                     {comment.timestamp instanceof Timestamp
-                      ? comment.timestamp.toDate().toLocaleString() // Convert Firestore Timestamp to Date
+                      ? comment.timestamp.toDate().toLocaleString()
                       : "Invalid date"}
                   </Typography>
                   <Typography variant="body1" style={{ marginTop: "5px" }}>
-                    {comment.comment} {/* Display comment */}
+                    {comment.comment} 
                   </Typography>
-                  <hr style={{ margin: "10px 0" }} /> {/* Horizontal line */}
+                  <hr style={{ margin: "10px 0" }} />
                 </Box>
               ))}
             </Box>
-          </Box>
+          </Box> */}
         </Box>
       </Box>
     </Modal>
