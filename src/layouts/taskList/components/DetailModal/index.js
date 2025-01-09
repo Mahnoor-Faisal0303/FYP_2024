@@ -2,6 +2,7 @@ import styles from "./modal.module.css";
 import PropTypes from "prop-types";
 import { Typography, Box, Button, Select, MenuItem, TextField } from "@mui/material";
 import Modal from "@mui/material/Modal";
+import MDButton from "components/MDButton";
 import {
   deleteDoc,
   doc,
@@ -195,9 +196,10 @@ const DetailModal = (props) => {
                     rows={4}
                     style={{ flexGrow: 1, marginRight: "10px" }}
                   />
-                  <Button variant="contained" onClick={handleSendComment}>
+               
+                  <MDButton variant="gradient" color="info" onClick={handleSendComment}>
                     Send
-                  </Button>
+                  </MDButton>
                 </Box>
                 <Box marginTop="10px">
                   {comments.map((comment) => (
