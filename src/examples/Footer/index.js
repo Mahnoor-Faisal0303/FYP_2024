@@ -99,12 +99,12 @@ function Footer({ company, links }) {
 
 // Setting default values for the props of Footer
 Footer.defaultProps = {
-  company: { href: "https://www.creative-tim.com/", name: "Creative Tim" },
+  company: { href: "https://www.creative-tim.com/", name: "Karachi University Students" },
   links: [
-    { href: "https://www.creative-tim.com/", name: "Creative Tim" },
-    { href: "https://www.creative-tim.com/presentation", name: "About Us" },
-    { href: "https://www.creative-tim.com/blog", name: "Blog" },
-    { href: "https://www.creative-tim.com/license", name: "License" },
+    { href: "https://www.google.com/search?gs_ssp=eJzj4tTP1TcwrUgyLzRg9BLKTixKTM7IVCjNyyxLLSrOLKkEAJlGCqg&q=karachi+university&rlz=1C1CHBF_enPK1038PK1038&oq=ka&gs_lcrp=EgZjaHJvbWUqDAgBEC4YJxiABBiKBTIPCAAQIxgnGOMCGIAEGIoFMgwIARAuGCcYgAQYigUyEggCEC4YQxiDARixAxiABBiKBTIGCAMQRRg5MgwIBBAAGEMYgAQYigUyBggFEEUYPDIGCAYQRRg8MgYIBxBFGDzSAQgzNjY2ajBqN6gCCLACAQ&sourceid=chrome&ie=UTF-8", name: "UBIT" },
+    { href: "www.linkedin.com/in/mahnoor-faisal-2519a0245", name: "About Us" },
+    { href: "https://github.com/Mahnoor-Faisal0303/FYP_2024", name: "Blog" },
+    { href: "https://github.com/Mahnoor-Faisal0303/FYP_2024", name: "License" },
   ],
 };
 
