@@ -132,6 +132,8 @@ If the user says, 'Assign the Responsive ticket to Saeed,' the system should und
 Responsive refers to the title of the ticket.
 Saeed refers to the assignee.
 
+always save old title.
+
 After processing the update, the system should return a success response in the following JSON format:
 {
 title: string,
@@ -272,7 +274,7 @@ phrase is "${speechString}"`;
     const querySnapshot = await getDocs(collection(db, "tasks"));
     querySnapshot.forEach(async (document) => {
       let dbData = document.data();
-      if (dbData.title?.toLowerCase() === json.oldTitle?.toLowerCase()) {
+      if (dbData.title?.toLowerCase() === (json.oldTitle ?? json.title ?? "").toLowerCase()) {
         const docRef = doc(db, "tasks", document.id);
         await updateDoc(docRef, {
           title: json.title ?? dbData.title,
