@@ -11,6 +11,8 @@ import { db } from "../authentication/FirebaseConfig";
 import { onSnapshot } from "firebase/firestore";
 import ProjectDropdown from "./components/ProjectDropdown/ProjectDropdown";
 import { ProjectContext } from "../../providers/ProjectProvider";
+import AssigneeFilter from "./components/AssigneeFilter/AssigneeFilter";
+import SearchField from "./components/Search/Search";
 
 function TaskList() {
   const { defaultProject } = useContext(ProjectContext);
@@ -28,6 +30,20 @@ function TaskList() {
   const [description, setDescription] = useState(null);
   const [assignee, setAssignee] = useState(null);
   const [status, setStatus] = useState(null);
+
+  const [selectedAssignee, setSelectedAssignee] = useState("");
+
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  const handleSearch = (query) => {
+    console.log("Search Query:", query);
+    setSearchQuery(query);
+  };
+
+  const handleAssigneeChange = (assignee) => {
+    setSelectedAssignee(assignee);
+    console.log("Selected Assignee:", selectedAssignee);
+  };
 
   const handleOpenModal = (id, title, description, assignee, status) => {
     setOpen(true);
@@ -119,11 +135,21 @@ function TaskList() {
         done.splice(0, done.length);
         setTodos([]);
         querySnapshot.forEach((doc) => {
-          if (doc.data().projectId != defaultProject?.id) {
-            return;
-          }
           console.log(`${doc.id} => ${doc.data()}`, doc.data());
           let docData = doc.data();
+          if (docData.projectId != defaultProject?.id) {
+            return;
+          }
+          if (selectedAssignee && selectedAssignee != "all") {
+            if (selectedAssignee != docData.assignee) {
+              return;
+            }
+          }
+          if(searchQuery) {
+            if (!docData.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+              return;
+            }
+          }
           docData.id = doc.id;
           if (docData.status === "todo") {
             todos.push(docData);
@@ -145,12 +171,14 @@ function TaskList() {
       });
     };
     getTask();
-  }, [defaultProject]);
+  }, [defaultProject, selectedAssignee, searchQuery]);
 
   return (
     <DashboardLayout>
       <DashboardNavbar absolute isMini />
       <ProjectDropdown />
+      <AssigneeFilter onAssigneeChange={handleAssigneeChange} />
+      <SearchField onSearch={handleSearch} />
       <MDBox sx={{ marginBottom: "220px", marginTop: "40px" }}>
         <DragDropContext onDragEnd={handleOnDragEnd}>
           <Box display={"flex"} flexDirection={"row"} sx={{ justifyContent: "space-between" }}>
