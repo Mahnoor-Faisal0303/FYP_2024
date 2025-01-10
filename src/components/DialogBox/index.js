@@ -3,6 +3,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import PauseCircleIcon from "@mui/icons-material/PauseCircle";
 import SendIcon from "@mui/icons-material/Send";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import styles from "./taskassign.module.css";
@@ -10,7 +11,13 @@ import Modal from "@mui/material/Modal";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
 import micImage from "../../assets/images/icons/flags/mic.png";
-
+import {
+  onSnapshot,
+  query,
+  where,
+  Timestamp,
+} from "firebase/firestore";
+import { appAuth } from "../../layouts/authentication/FirebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../../layouts/authentication/FirebaseConfig";
 import { getDocs, updateDoc, doc, deleteDoc } from "firebase/firestore";
@@ -36,6 +43,44 @@ const TaskAssign = ({ open, handleClose }) => {
   const [description, setDescription] = useState(null);
   const [assignee, setAssignee] = useState(null);
   const [status, setStatus] = useState(null);
+  const [currentUserName, setCurrentUserName] = useState("");
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const capitalizeName = (name) => {
+      if (!name) return "Unknown"; // Handle null or undefined names
+      return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+    };
+    const getUsers = () => {
+      onSnapshot(collection(db, "users"), (querySnapshot) => {
+        let usersData = [{ name: "Unassigned" }];
+
+        querySnapshot.forEach((doc) => {
+          let docData = doc.data();
+          docData.name = capitalizeName(docData.name);
+          usersData.push(docData);
+        });
+
+        setUsers(usersData);
+      });
+    };
+    getUsers();
+  }, []);
+
+  useEffect(() => {
+    const user = appAuth.currentUser; // Get the current user from Firebase Auth
+    console.log("user: ", user);
+    if (user) {
+      const currentUserId = user.uid; // Get the current user's ID
+      console.log("currentUserId: ", currentUserId);
+      console.log("users: ", users);
+      const currentUser = users.find((user) => user.uid === currentUserId);
+      console.log("currentUser: ", currentUser);
+      if (currentUser) {
+        setCurrentUserName(currentUser.name);
+      }
+    }
+  }, [users]);
 
   const handleOpenModal = (id, title, description, assignee, status) => {
     setOpenDetailModal(true);
@@ -49,6 +94,11 @@ const TaskAssign = ({ open, handleClose }) => {
 
   const send = async () => {
     let prompt = `we have phrase I need you can extract the data
+
+If the user says, 'Create/move/update/assign the Responsive ticket or create/move/update/assign the Responsive task or create/move/update/assign the feature task Responsive or create/move/update/assign the bug title Responsive' the system should understand that:
+
+Responsive refers to the title of the ticket/task/feature/bug.
+
 If phrase starts with create a task or may be ticket or may be todo and has title,description and assignee than return success json in this format
 {
 title : string,
@@ -57,7 +107,7 @@ assignee: string,
 action:"create"
 } 
 
-or if phrase starts with move and end with to any state like inprogress, testing and done then return success json in this format 
+or if phrase starts with move and end with to any state like todo, inprogress, testing and done then return success json in this format 
 {
 title :string,
 state: string,
@@ -72,6 +122,44 @@ or if phrase starts with delete, then return success json in this format:
 {
 title :string,
 action:"delete"
+}
+or If the user provides only the assignee value, the system should update the ticket with the new assignee and return the updated details. Similarly, if the user provides all or a combination of the fields, such as title, description, assignee, or status, the system should update those specific fields while keeping any non-specified fields unchanged.
+
+The system is flexible, allowing updates to discrete fields (like assigning a task to someone) or to multiple fields at once (like changing the title, description, and status).
+
+If the user says, 'Assign the Responsive ticket to Saeed,' the system should understand that:
+
+Responsive refers to the title of the ticket.
+Saeed refers to the assignee.
+
+always save old title.
+
+After processing the update, the system should return a success response in the following JSON format:
+{
+title: string,
+description: string,
+assignee: string,
+status: string,
+action:"update",
+oldTitle: string
+}
+or if the phrase wants to add the comment into the ticket or task
+
+If the user says, 'Add a comment Please give me estimation into the Responsive ticket' the system should understand that:
+
+Responsive refers to the title of the ticket.
+Please give me estimation refers to the comment.
+
+If the user says, 'Add a comment Please give me estimation into the Responsive task' the system should understand that:
+
+Responsive refers to the title of the ticket.
+Please give me estimation refers to the comment.
+
+After processing the update, the system should return a success response in the following JSON format:
+{
+title: string,
+comment: string,
+action:"addComment"
 }
 and if phrase didn't give the title or state then return failure data as:
 {
@@ -93,7 +181,7 @@ phrase is "${speechString}"`;
       const result = await model.generateContent(prompt);
       const response = result.response;
       const text = response.text();
-      //console.log(text, "<<<<<<<<<");
+      console.log(text, "Response");
 
       let json = JSON.parse(text);
       if (json.error) {
@@ -112,6 +200,12 @@ phrase is "${speechString}"`;
       if (json.action == "delete") {
         console.log("delter karrrrrrr");
         deleteTask(json);
+      }
+      if (json.action == "update") {
+        updateTask(json);
+      }
+      if (json.action == "addComment") {
+        addComment(json);
       }
 
     } catch (error) {
@@ -164,6 +258,7 @@ phrase is "${speechString}"`;
       }
     });
   };
+
   const deleteTask = async (json) => {
     const querySnapshot = await getDocs(collection(db, "tasks"));
     querySnapshot.forEach(async (document) => {
@@ -174,58 +269,99 @@ phrase is "${speechString}"`;
     });
   };
 
+  const updateTask = async (json) => {
+    handleClose();
+    const querySnapshot = await getDocs(collection(db, "tasks"));
+    querySnapshot.forEach(async (document) => {
+      let dbData = document.data();
+      if (dbData.title?.toLowerCase() === (json.oldTitle ?? json.title ?? "").toLowerCase()) {
+        const docRef = doc(db, "tasks", document.id);
+        await updateDoc(docRef, {
+          title: json.title ?? dbData.title,
+          description: json.description ?? dbData.description,
+          status: json.status ?? dbData.status,
+          assignee: json.assignee ?? dbData.assignee,
+        });
+      }
+    });
+  };
+
+  const addComment = async (json) => {
+    handleClose();
+    const querySnapshot = await getDocs(collection(db, "tasks"));
+    querySnapshot.forEach(async (document) => {
+      let dbData = document.data();
+      if (dbData.title?.toLowerCase() === json.title?.toLowerCase()) {
+        const timestamp = new Date(); // Get current date and time
+
+        const commentData = {
+          taskId: document.id,
+          userName: currentUserName,
+          comment: json.comment,
+          timestamp: timestamp, // Include the timestamp
+        };
+
+        try {
+          await addDoc(collection(db, "comments"), commentData);
+        } catch (error) {
+          console.error("Error adding comment: ", error);
+        }
+      }
+    });
+  };
+
   useEffect(() => {
     setSpeechString(transcript);
   }, [transcript]);
 
   return (
     <>
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <Box className={styles.container}>
-        <Box className={styles.headerContainer}>
-          <Typography fontSize={15}>Microphone: {listening ? "on" : "off"}</Typography>
-          <Box>
-            <IconButton onClick={SpeechRecognition.stopListening}>
-              <PauseCircleIcon />
-            </IconButton>
-            <IconButton onClick={resetTranscript}>
-              <DeleteIcon />
-            </IconButton>
-            {/* <Button sx={{ cursor: "pointer", alignSelf: "end" }} onClick={createTask}>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box className={styles.container}>
+          <Box className={styles.headerContainer}>
+            <Typography fontSize={15}>Microphone: {listening ? "on" : "off"}</Typography>
+            <Box>
+              <IconButton onClick={SpeechRecognition.stopListening}>
+                <PauseCircleIcon />
+              </IconButton>
+              <IconButton onClick={resetTranscript}>
+                <DeleteIcon />
+              </IconButton>
+              {/* <Button sx={{ cursor: "pointer", alignSelf: "end" }} onClick={createTask}>
               Create Task
             </Button> */}
-          </Box>
-        </Box>
-        <Box className={styles.bodyContainer}>
-          <TextField
-            value={speechString}
-            onChange={(event) => setSpeechString(event.target.value)}
-            fullWidth={true}
-            sx={{ "& fieldset": { border: "none" } }}
-          />
-          {speechString && (
-            <Box className={styles.sendIcon} onClick={send}>
-              <SendIcon />
             </Box>
-          )}
-        </Box>
-        <Box className={styles.footer}>
-          <Box className={styles.mic}></Box>
-          <Box onClick={speechRecognize} sx={{ zIndex: 1, marginTop: "20px" }}>
-            <img
-              src={micImage}
-              alt="mic"
-              style={{ width: "36px", height: "36px", cursor: "pointer" }}
-            />
           </Box>
-          <Box className={styles.micshadow}></Box>
-        </Box>
-        {/* <Box
+          <Box className={styles.bodyContainer}>
+            <TextField
+              value={speechString}
+              onChange={(event) => setSpeechString(event.target.value)}
+              fullWidth={true}
+              sx={{ "& fieldset": { border: "none" } }}
+            />
+            {speechString && (
+              <Box className={styles.sendIcon} onClick={send}>
+                <SendIcon />
+              </Box>
+            )}
+          </Box>
+          <Box className={styles.footer}>
+            <Box className={styles.mic}></Box>
+            <Box onClick={speechRecognize} sx={{ zIndex: 1, marginTop: "20px" }}>
+              <img
+                src={micImage}
+                alt="mic"
+                style={{ width: "36px", height: "36px", cursor: "pointer" }}
+              />
+            </Box>
+            <Box className={styles.micshadow}></Box>
+          </Box>
+          {/* <Box
             sx={{
               border: "1px solid black",
               borderRadius: "10px",
@@ -283,7 +419,7 @@ phrase is "${speechString}"`;
               </Box>
             )} 
           </Box> */}
-        {/* {showCard && title && (
+          {/* {showCard && title && (
             <Box
               sx={{
                 width: "40%",
@@ -320,10 +456,10 @@ phrase is "${speechString}"`;
               </Button>
             </Box>
           )} */}
-        {/* </Box> */}
-      </Box>
-    </Modal>
-    <DetailModal open={openDetailModal} onClose={handleDetailModalClose} title={title} description={description} assignee={assignee} status={status}/>
+          {/* </Box> */}
+        </Box>
+      </Modal>
+      <DetailModal open={openDetailModal} onClose={handleDetailModalClose} title={title} description={description} assignee={assignee} status={status} />
     </>
   );
 };
