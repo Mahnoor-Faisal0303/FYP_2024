@@ -4,7 +4,7 @@ import PauseCircleIcon from "@mui/icons-material/PauseCircle";
 import SendIcon from "@mui/icons-material/Send";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import styles from "./taskassign.module.css";
 import Modal from "@mui/material/Modal";
@@ -23,8 +23,11 @@ import { db } from "../../layouts/authentication/FirebaseConfig";
 import { getDocs, updateDoc, doc, deleteDoc } from "firebase/firestore";
 
 import DetailModal from "../../layouts/taskList/components/DetailModal";
+import { ProjectContext } from "../../providers/ProjectProvider";
 
 const TaskAssign = ({ open, handleClose }) => {
+  const { defaultProject } = useContext(ProjectContext);
+
   const { transcript, listening, resetTranscript } = useSpeechRecognition();
 
   const [speechString, setSpeechString] = useState("");
@@ -225,6 +228,7 @@ phrase is "${speechString}"`;
         title: json.title,
         description: json.description,
         assignee: json.assignee,
+        proectId: defaultProject.id,
         status: "todo",
       });
       console.log("Document written with ID: ", docRef.id);

@@ -27,6 +27,7 @@ import KeyboardVoiceOutlinedIcon from "@mui/icons-material/KeyboardVoiceOutlined
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import zIndex from "@mui/material/styles/zIndex";
+import { ProjectProvider } from "providers/ProjectProvider";
 
 export default function App() {
   // const [modalOpen , setModalOpen] = useState(false);
@@ -77,8 +78,8 @@ export default function App() {
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-    setLogin(currentUser != null);
-    console.log(auth.currentUser,"i am");
+      setLogin(currentUser != null);
+      console.log(auth.currentUser, "i am");
     });
 
     return () => unsubscribe();
@@ -155,27 +156,68 @@ export default function App() {
     <CacheProvider value={rtlCache}>
       <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
         <CssBaseline />
-        <>
-  {login == null ? (
-    <Box style={{ width: "100%", height: "100%", background: "red",zIndex:"999"}}>
-    </Box>
+        <ProjectProvider>
+          <>
+            {login == null ? (
+              <Box style={{ width: "100%", height: "100%", background: "red", zIndex: "999" }}>
+              </Box>
+            ) : (
+              <Routes>
+                {getRoutes(routes)}
+                {login ? (
+                  <Route path="*" element={<Navigate to="/dashboard" />} />
+                ) : (
+                  <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
+                )}
+              </Routes>
+            )}
+          </>
+          {layout === "dashboard" && (
+            <>
+              <Sidenav
+                color={sidenavColor}
+                brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
+                brandName="Dashboard"
+                routes={routes}
+                onMouseEnter={handleOnMouseEnter}
+                onMouseLeave={handleOnMouseLeave}
+              />
+              <Configurator />
+              {configsButton}
+            </>
+          )}
+          {layout === "vr" && <Configurator />}
+          <div>
+            <button onClick={notify}>Notify!</button>
+            <ToastContainer />
+          </div>
+        </ProjectProvider>
+      </ThemeProvider>
+    </CacheProvider >
   ) : (
-    <Routes>
-      {getRoutes(routes)}
-      {login ? (
-        <Route path="*" element={<Navigate to="/dashboard" />} />
-      ) : (
-        <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
-      )}
-    </Routes>
-  )}
-</>
+    <ThemeProvider theme={darkMode ? themeDark : theme}>
+      <CssBaseline />
+      <ProjectProvider>
+        <>
+          {login == null ? (
+            <Box style={{ width: "100%", height: "100%", background: "red", zIndex: "999" }}></Box>
+          ) : (
+            <Routes>
+              {getRoutes(routes)}
+              {login ? (
+                <Route path="*" element={<Navigate to="/dashboard" />} />
+              ) : (
+                <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
+              )}
+            </Routes>
+          )}
+        </>
         {layout === "dashboard" && (
           <>
             <Sidenav
               color={sidenavColor}
               brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-              brandName="Dashboard"
+              brandName="TASKPro"
               routes={routes}
               onMouseEnter={handleOnMouseEnter}
               onMouseLeave={handleOnMouseLeave}
@@ -184,47 +226,9 @@ export default function App() {
             {configsButton}
           </>
         )}
-        {layout === "vr" && <Configurator />} 
-        <div>
-          <button onClick={notify}>Notify!</button>
-          <ToastContainer />
-        </div>
-      </ThemeProvider>
-    </CacheProvider>
-  ) : (
-    <ThemeProvider theme={darkMode ? themeDark : theme}>
-      <CssBaseline />
-      <>
-     {login == null ? (
-    <Box style={{ width: "100%", height: "100%", background: "red", zIndex:"999" }}></Box>
-  ) : (
-    <Routes>
-      {getRoutes(routes)}
-      {login ? (
-        <Route path="*" element={<Navigate to="/dashboard" />} />
-      ) : (
-        <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
-      )}
-    </Routes>
-  )}
-</>
-      {layout === "dashboard" && (
-        <>
-          <Sidenav
-            color={sidenavColor}
-            brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-            brandName="TASKPro"
-            routes={routes}
-            onMouseEnter={handleOnMouseEnter}
-            onMouseLeave={handleOnMouseLeave}
-          />
-          <Configurator />
-          {configsButton}
-        </>
-      )}
-      {layout === "vr" && <Configurator />}
+        {layout === "vr" && <Configurator />}
 
-      {/* <Routes>
+        {/* <Routes>
         {getRoutes(routes)}
         { login == null ? (
           <>
@@ -254,6 +258,7 @@ export default function App() {
           pauseOnHover
           theme="light"
         />
+      </ProjectProvider>
     </ThemeProvider>
   );
 }

@@ -1,16 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import { Typography, Box} from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import DetailModal from "./components/DetailModal";
 import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
 import { db } from "../authentication/FirebaseConfig";
 import { onSnapshot } from "firebase/firestore";
+import ProjectDropdown from "./components/ProjectDropdown/ProjectDropdown";
+import { ProjectContext } from "../../providers/ProjectProvider";
 
 function TaskList() {
+  const { defaultProject } = useContext(ProjectContext);
+
   const [todos, setTodos] = useState([]);
   const [progress, setProgress] = useState([]);
   const [testing, setTesting] = useState([]);
@@ -115,6 +119,9 @@ function TaskList() {
         done.splice(0, done.length);
         setTodos([]);
         querySnapshot.forEach((doc) => {
+          if (doc.data().projectId != defaultProject?.id) {
+            return;
+          }
           console.log(`${doc.id} => ${doc.data()}`, doc.data());
           let docData = doc.data();
           docData.id = doc.id;
@@ -138,11 +145,12 @@ function TaskList() {
       });
     };
     getTask();
-  }, []);
+  }, [defaultProject]);
 
   return (
     <DashboardLayout>
       <DashboardNavbar absolute isMini />
+      <ProjectDropdown />
       <MDBox sx={{ marginBottom: "220px", marginTop: "40px" }}>
         <DragDropContext onDragEnd={handleOnDragEnd}>
           <Box display={"flex"} flexDirection={"row"} sx={{ justifyContent: "space-between" }}>
