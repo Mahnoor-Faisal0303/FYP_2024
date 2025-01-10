@@ -21,10 +21,44 @@ import assigneeImage from "../../../../assets/images/icons/assignee.svg";
 import deleteImage from "../../../../assets/images/icons/delete.svg";
 import React, { useEffect, useState } from "react";
 import { appAuth } from "../../../authentication/FirebaseConfig";
+import { getDocs } from "firebase/firestore";
 
 const DetailModal = (props) => {
   const { open, onClose, title, description, assignee, status, id } = props;
 
+  const [tempTitle, setTempTitle] = useState(title);
+  const [tempDescription, setTempDescription] = useState(description);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleChange = (e) => {
+    setTempTitle(e.target.value);
+  };
+  const handleChangeDetail = (e) => {
+    setTempDescription(e.target.value);
+  };
+
+  useEffect(()=> {
+    setTempTitle(title);
+    setTempDescription(description);
+  },[id]);
+
+  const handleSave = async () => {
+    try {
+      const taskDocRef = doc(db, "tasks", id);
+      await updateDoc(taskDocRef, {
+        title: tempTitle,
+        description: tempDescription,
+      });
+      setIsEditing(false);
+      console.log("Title updated successfully");
+    } catch (error) {
+      console.error("Error updating title:", error);
+    }
+  };
   const deleteTask = async () => {
     onClose();
     await deleteDoc(doc(db, "tasks", id));
@@ -32,7 +66,7 @@ const DetailModal = (props) => {
 
   const [selectedAssignee, setSelectedAssignee] = useState("Unassigned");
   const [users, setUsers] = useState([]);
-  const [selectedStatus, setSelectedStatus] = useState(status);
+  const [selectedStatus, setSelectedStatus] = useState();
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [currentUserName, setCurrentUserName] = useState("");
@@ -82,7 +116,7 @@ const DetailModal = (props) => {
   // Fetch comments for the task
   useEffect(() => {
     if (!id) return; // Ensure id is defined
-
+    setComments([]);
     const commentsRef = collection(db, "comments");
     const q = query(commentsRef, where("taskId", "==", id));
 
@@ -102,7 +136,7 @@ const DetailModal = (props) => {
 
   useEffect(() => {
     setSelectedStatus(status);
-  }, [status]);
+  }, [id]);
 
   const handleSelectedAssignee = async (event) => {
     const docRef = doc(db, "tasks", id);
@@ -172,18 +206,98 @@ const DetailModal = (props) => {
           <Box className={styles.parent}>
             <Box className={styles.scroll}>
               <Box className={styles.modal_heading}>
-                <Typography variant="h3" className={styles.modal_child}>
-                  {title}
-                </Typography>
+                {isEditing ? (
+                  <>
+                    <TextField
+                      value={tempTitle}
+                      onChange={handleChange}
+                      autoFocus
+                      variant="standard"
+                      size="small"
+                      InputProps={{
+                        disableUnderline: true,
+                        style: {
+                          fontSize: "22px",
+                          fontWeight: "bold",
+                          color: "black",
+                        },
+                      }}
+                      sx={{width:'100%'}}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <TextField
+                      value={tempTitle}
+                      size="small"
+                      variant="standard"
+                      InputProps={{
+                        disableUnderline: true,
+                        readOnly: true,
+                        style: {
+                          fontSize: "22px",
+                          fontWeight: "bold",
+                          color: "black",
+                        },
+                      }}
+                      sx={{width:'100%'}}
+                      onClick={handleClick}
+                    />
+                  </>
+                )}
               </Box>
-              <hr style={{ marginTop: "20px" }} />
-              <Box className={styles.modal_detail}>
+              <hr style={{ marginTop: "4px" }} />
+              <Box className={styles.modal_detail} >
                 <Typography variant="h4" className={styles.detailH}>
                   Details
                 </Typography>
-                <Typography className={styles.detail}>{description}</Typography>
+                {isEditing ? 
+                (
+                  <TextField
+                      value={tempDescription}
+                      onChange={handleChangeDetail}
+                      autoFocus
+                      variant="standard"
+                      sx={{width:'100%'}}
+                      InputProps={{
+                        disableUnderline: true,
+                        style: {
+                          fontSize: "14px",
+                          color: "black",
+                        },
+                      }}
+                    />
+                ):(
+                  <TextField
+                      value={tempDescription}
+                      size="small"
+                      variant="standard"
+                      sx={{width:'100%'}}
+                      InputProps={{
+                        disableUnderline: true,
+                        readOnly: true,
+                        style: {
+                          fontSize: "14px",
+                          color: "black",
+                        },
+                      }}
+                      onClick={handleClick}
+                    />
+                )}
               </Box>
-              <hr style={{ margin: "10px 0" }} />
+              <hr style={{ margin: "4px 0" }} />
+              {isEditing ? (
+                <MDButton
+                  variant="gradient"
+                  color="info"
+                  onClick={handleSave}
+                  style={{ marginTop: "4px",marginBottom:"10px" }}
+                >
+                  Save
+                </MDButton>
+              ) : (
+                <></>
+              )}
               <Box className={styles.commentSection}>
                 <Typography variant="h6">Comments</Typography>
                 <Box display="flex" alignItems="center" marginTop="10px">
@@ -196,7 +310,7 @@ const DetailModal = (props) => {
                     rows={4}
                     style={{ flexGrow: 1, marginRight: "10px" }}
                   />
-               
+
                   <MDButton variant="gradient" color="info" onClick={handleSendComment}>
                     Send
                   </MDButton>
@@ -260,6 +374,7 @@ const DetailModal = (props) => {
                   Assignee:
                 </Typography>
                 <Select
+                  key={id}
                   value={selectedAssignee}
                   onChange={handleSelectedAssignee}
                   className={styles.gap}
