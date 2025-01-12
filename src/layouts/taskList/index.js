@@ -1,16 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import { Typography, Box} from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import DetailModal from "./components/DetailModal";
 import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
 import { db } from "../authentication/FirebaseConfig";
 import { onSnapshot } from "firebase/firestore";
+import ProjectDropdown from "./components/ProjectDropdown/ProjectDropdown";
+import { ProjectContext } from "../../providers/ProjectProvider";
+import AssigneeFilter from "./components/AssigneeFilter/AssigneeFilter";
+import SearchField from "./components/Search/Search";
 
 function TaskList() {
+  const { defaultProject } = useContext(ProjectContext);
+
   const [todos, setTodos] = useState([]);
   const [progress, setProgress] = useState([]);
   const [testing, setTesting] = useState([]);
@@ -24,6 +30,20 @@ function TaskList() {
   const [description, setDescription] = useState(null);
   const [assignee, setAssignee] = useState(null);
   const [status, setStatus] = useState(null);
+
+  const [selectedAssignee, setSelectedAssignee] = useState("");
+
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  const handleSearch = (query) => {
+    console.log("Search Query:", query);
+    setSearchQuery(query);
+  };
+
+  const handleAssigneeChange = (assignee) => {
+    setSelectedAssignee(assignee);
+    console.log("Selected Assignee:", selectedAssignee);
+  };
 
   const handleOpenModal = (id, title, description, assignee, status) => {
     setOpen(true);
@@ -117,6 +137,19 @@ function TaskList() {
         querySnapshot.forEach((doc) => {
           console.log(`${doc.id} => ${doc.data()}`, doc.data());
           let docData = doc.data();
+          if (docData.projectId != defaultProject?.id) {
+            return;
+          }
+          if (selectedAssignee && selectedAssignee != "all") {
+            if (selectedAssignee != docData.assignee) {
+              return;
+            }
+          }
+          if(searchQuery) {
+            if (!docData.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+              return;
+            }
+          }
           docData.id = doc.id;
           if (docData.status === "todo") {
             todos.push(docData);
@@ -138,11 +171,14 @@ function TaskList() {
       });
     };
     getTask();
-  }, []);
+  }, [defaultProject, selectedAssignee, searchQuery]);
 
   return (
     <DashboardLayout>
       <DashboardNavbar absolute isMini />
+      <ProjectDropdown />
+      <AssigneeFilter onAssigneeChange={handleAssigneeChange} />
+      <SearchField onSearch={handleSearch} />
       <MDBox sx={{ marginBottom: "220px", marginTop: "40px" }}>
         <DragDropContext onDragEnd={handleOnDragEnd}>
           <Box display={"flex"} flexDirection={"row"} sx={{ justifyContent: "space-between" }}>
