@@ -116,7 +116,7 @@ title :string,
 state: string,
 action:"move"
 }
-or if phrase starts with open or show details , then return success json in this format:
+or if phrase starts with open/show details , then return success json in this format:
 {
 title :string,
 action:"open"
@@ -224,11 +224,12 @@ phrase is "${speechString}"`;
   const createTask = async (json) => {
     handleClose();
     try {
+      console.log(defaultProject.id,"<<<<<<<<<<<<<<<<<<<<<<<<<<<default project");
       const docRef = await addDoc(collection(db, "tasks"), {
         title: json.title,
         description: json.description,
         assignee: json.assignee,
-        proectId: defaultProject.id,
+        projectId: defaultProject.id,
         status: "todo",
       });
       console.log("Document written with ID: ", docRef.id);
@@ -463,7 +464,7 @@ phrase is "${speechString}"`;
           {/* </Box> */}
         </Box>
       </Modal>
-      <DetailModal open={openDetailModal} onClose={handleDetailModalClose} title={title} description={description} assignee={assignee} status={status} />
+      <DetailModal open={openDetailModal} onClose={handleDetailModalClose} title={title} description={description} assignee={assignee} status={status} id={id}/>
     </>
   );
 };

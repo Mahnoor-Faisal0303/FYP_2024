@@ -44,7 +44,7 @@ const DetailModal = (props) => {
   useEffect(()=> {
     setTempTitle(title);
     setTempDescription(description);
-  },[id]);
+  },[id, title , description]);
 
   const handleSave = async () => {
     try {

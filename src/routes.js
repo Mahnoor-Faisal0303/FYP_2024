@@ -2,8 +2,8 @@ import Dashboard from "layouts/dashboard";
 import Authors from "layouts/tables";
 import TaskList from "layouts/taskList";
 import Projects from "layouts/projects";
-import RTL from "layouts/rtl";
-import Notifications from "layouts/notifications";
+// import RTL from "layouts/rtl";
+// import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
@@ -21,6 +21,14 @@ const routes = [
   },
   {
     type: "collapse",
+    name: "Task Board",
+    key: "task",
+    icon: <Icon fontSize="small">receipt_long</Icon>,
+    route: "/task",
+    component: <TaskList />,
+  },
+  {
+    type: "collapse",
     name: "Projects",
     key: "projects",
     icon: <Icon fontSize="small">folder</Icon>,
@@ -35,14 +43,6 @@ const routes = [
     route: "/authors",
     component: <Authors />,
   },
-  {
-    type: "collapse",
-    name: "Task Board",
-    key: "task board",
-    icon: <Icon fontSize="small">receipt_long</Icon>,
-    route: "/task",
-    component: <TaskList />,
-  },
   // {
   //   type: "collapse",
   //   name: "RTL",
@@ -51,14 +51,14 @@ const routes = [
   //   route: "/rtl",
   //   component: <RTL />,
   // },
-  {
-    type: "collapse",
-    name: "Notifications",
-    key: "notifications",
-    icon: <Icon fontSize="small">notifications</Icon>,
-    route: "/notifications",
-    component: <Notifications />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Notifications",
+  //   key: "notifications",
+  //   icon: <Icon fontSize="small">notifications</Icon>,
+  //   route: "/notifications",
+  //   component: <Notifications />,
+  // },
   {
     type: "collapse",
     name: "Profile",
@@ -68,7 +68,7 @@ const routes = [
     component: <Profile />,
   },
   {
-    type: "collapse",
+    // type: "collapse",
     name: "Sign In",
     key: "sign-in",
     icon: <Icon fontSize="small">login</Icon>,
@@ -76,7 +76,7 @@ const routes = [
     component: <SignIn />,
   },
   {
-    type: "collapse",
+    // type: "collapse",
     name: "Sign Up",
     key: "sign-up",
     icon: <Icon fontSize="small">assignment</Icon>,

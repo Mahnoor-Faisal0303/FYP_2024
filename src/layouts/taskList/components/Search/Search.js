@@ -9,7 +9,6 @@ const SearchField = ({ onSearch }) => {
     const query = event.target.value;
     setSearchQuery(query);
 
-    // Trigger onSearch callback with the current search query
     if (onSearch) {
       onSearch(query);
     }

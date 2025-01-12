@@ -14,9 +14,12 @@ import { ProjectContext } from "../../providers/ProjectProvider";
 import AssigneeFilter from "./components/AssigneeFilter/AssigneeFilter";
 import SearchField from "./components/Search/Search";
 import Grid from "@mui/material/Grid";
+import Stack from "@mui/material/Stack";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function TaskList() {
   const { defaultProject } = useContext(ProjectContext);
+  const [loading, setLoading] = useState(true);
 
   const [todos, setTodos] = useState([]);
   const [progress, setProgress] = useState([]);
@@ -35,7 +38,7 @@ function TaskList() {
   const [selectedAssignee, setSelectedAssignee] = useState("");
 
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   const handleSearch = (query) => {
     console.log("Search Query:", query);
     setSearchQuery(query);
@@ -129,6 +132,7 @@ function TaskList() {
 
   useEffect(() => {
     const getTask = () => {
+      setLoading(true);
       onSnapshot(collection(db, "tasks"), (querySnapshot) => {
         todos.splice(0, todos.length);
         progress.splice(0, progress.length);
@@ -142,11 +146,11 @@ function TaskList() {
             return;
           }
           if (selectedAssignee && selectedAssignee != "all") {
-            if (selectedAssignee != docData.assignee) {
+            if (selectedAssignee.toLowerCase() != docData.assignee.toLowerCase()) {
               return;
             }
           }
-          if(searchQuery) {
+          if (searchQuery) {
             if (!docData.title.toLowerCase().includes(searchQuery.toLowerCase())) {
               return;
             }
@@ -169,6 +173,7 @@ function TaskList() {
         setProgress([...progress]);
         setTesting([...testing]);
         setDone([...done]);
+        setLoading(false);
       });
     };
     getTask();
@@ -178,200 +183,204 @@ function TaskList() {
     <DashboardLayout>
       <DashboardNavbar absolute isMini />
       <MDBox sx={{ marginBottom: "220px", marginTop: "40px" }}>
-      <Grid container spacing={3}>
-      <Grid item xs={12} md={6} lg={6}>
-      <SearchField onSearch={handleSearch} />
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6} lg={6}>
+            <SearchField onSearch={handleSearch} />
+          </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+            <AssigneeFilter onAssigneeChange={handleAssigneeChange} />
+          </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+            <ProjectDropdown />
+          </Grid>
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
-        <AssigneeFilter onAssigneeChange={handleAssigneeChange} />
-        </Grid>
-        <Grid item xs={12} md={6} lg={3}>
-        
-        <ProjectDropdown />
-        </Grid>
-        </Grid>
-      
-        <DragDropContext onDragEnd={handleOnDragEnd}>
-          <Box display={"flex"} flexDirection={"row"} sx={{ justifyContent: "space-between" }}>
-            <Box width={"100%"} padding={2}>
-              <Typography variant="h3" fontFamily="Raleway" fontWeight={600} marginBottom="10px">
-                TODO
-              </Typography>
-              <Droppable droppableId="todo">
-                {(provided, snapshot) => (
-                  <Box ref={provided.innerRef} minHeight={100}>
-                    {todos.map((row, i) => (
-                      <Draggable key={todos[i].id} draggableId={todos[i].id} index={i}>
-                        {(provided, snapshot) => (
-                          <Typography
-                            padding={2}
-                            variant="h6"
-                            fontFamily="Raleway"
-                            fontWeight={600}
-                            key={i}
-                            sx={{
-                              marginBottom: "10px",
-                              borderRadius: "10px",
-                              background: "linear-gradient(#c7e4ed,#a8dded)",
-                              boxShadow: "0 4px 10px #c7e4ed",
-                            }}
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            onClick={() =>
-                              handleOpenModal(
-                                todos[i].id,
-                                todos[i].title,
-                                todos[i].description,
-                                todos[i].assignee,
-                                todos[i].status
-                              )
-                            }
-                          >
-                            {todos[i].title.toUpperCase()}
-                          </Typography>
-                        )}
-                      </Draggable>
-                    ))}
-                  </Box>
-                )}
-              </Droppable>
-            </Box>
-            <Box width={"100%"} padding={2}>
-              <Typography variant="h3" fontFamily="Raleway" fontWeight={600} marginBottom="10px">
-                IN PROGRESS
-              </Typography>
-              <Droppable droppableId="inprogress">
-                {(provided, snapshot) => (
-                  <Box ref={provided.innerRef} minHeight={100}>
-                    {progress.map((row, i) => (
-                      <Draggable key={progress[i].id} draggableId={progress[i].id} index={i}>
-                        {(provided, snapshot) => (
-                          <Typography
-                            padding={2}
-                            variant="h6"
-                            fontFamily="Raleway"
-                            fontWeight={600}
-                            key={i}
-                            sx={{
-                              marginBottom: "10px",
-                              borderRadius: "10px",
-                              background: "linear-gradient(#fcdea4,#ffd791)",
-                              boxShadow: "0 4px 10px #fcdea4",
-                            }}
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            onClick={() =>
-                              handleOpenModal(
-                                progress[i].id,
-                                progress[i].title,
-                                progress[i].description,
-                                progress[i].assignee,
-                                progress[i].status
-                              )
-                            }
-                          >
-                            {progress[i].title.toUpperCase()}
-                          </Typography>
-                        )}
-                      </Draggable>
-                    ))}
-                  </Box>
-                )}
-              </Droppable>
-            </Box>
-            <Box width={"100%"} padding={2}>
-              <Typography variant="h3" fontFamily="Raleway" fontWeight={600} marginBottom="10px">
-                TESTING
-              </Typography>
+        {loading ? (
+          <Stack display="flex" justifyContent="center" alignItems="center" marginTop="20px">
+            <CircularProgress size={40} />
+          </Stack>
+        ) : (
+          <DragDropContext onDragEnd={handleOnDragEnd}>
+            <Box display={"flex"} flexDirection={"row"} sx={{ justifyContent: "space-between" }}>
+              <Box width={"100%"} padding={2}>
+                <Typography variant="h3" fontFamily="Raleway" fontWeight={600} marginBottom="10px">
+                  TODO
+                </Typography>
+                <Droppable droppableId="todo">
+                  {(provided, snapshot) => (
+                    <Box ref={provided.innerRef} minHeight={100}>
+                      {todos.map((row, i) => (
+                        <Draggable key={todos[i].id} draggableId={todos[i].id} index={i}>
+                          {(provided, snapshot) => (
+                            <Typography
+                              padding={2}
+                              variant="h6"
+                              fontFamily="Raleway"
+                              fontWeight={600}
+                              key={i}
+                              sx={{
+                                marginBottom: "10px",
+                                borderRadius: "10px",
+                                background: "linear-gradient(#c7e4ed,#a8dded)",
+                                boxShadow: "0 4px 10px #c7e4ed",
+                              }}
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              onClick={() =>
+                                handleOpenModal(
+                                  todos[i].id,
+                                  todos[i].title,
+                                  todos[i].description,
+                                  todos[i].assignee,
+                                  todos[i].status
+                                )
+                              }
+                            >
+                              {todos[i].title.toUpperCase()}
+                            </Typography>
+                          )}
+                        </Draggable>
+                      ))}
+                    </Box>
+                  )}
+                </Droppable>
+              </Box>
+              <Box width={"100%"} padding={2}>
+                <Typography variant="h3" fontFamily="Raleway" fontWeight={600} marginBottom="10px">
+                  IN PROGRESS
+                </Typography>
+                <Droppable droppableId="inprogress">
+                  {(provided, snapshot) => (
+                    <Box ref={provided.innerRef} minHeight={100}>
+                      {progress.map((row, i) => (
+                        <Draggable key={progress[i].id} draggableId={progress[i].id} index={i}>
+                          {(provided, snapshot) => (
+                            <Typography
+                              padding={2}
+                              variant="h6"
+                              fontFamily="Raleway"
+                              fontWeight={600}
+                              key={i}
+                              sx={{
+                                marginBottom: "10px",
+                                borderRadius: "10px",
+                                background: "linear-gradient(#fcdea4,#ffd791)",
+                                boxShadow: "0 4px 10px #fcdea4",
+                              }}
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              onClick={() =>
+                                handleOpenModal(
+                                  progress[i].id,
+                                  progress[i].title,
+                                  progress[i].description,
+                                  progress[i].assignee,
+                                  progress[i].status
+                                )
+                              }
+                            >
+                              {progress[i].title.toUpperCase()}
+                            </Typography>
+                          )}
+                        </Draggable>
+                      ))}
+                    </Box>
+                  )}
+                </Droppable>
+              </Box>
+              <Box width={"100%"} padding={2}>
+                <Typography variant="h3" fontFamily="Raleway" fontWeight={600} marginBottom="10px">
+                  TESTING
+                </Typography>
 
-              <Droppable droppableId="testing">
-                {(provided, snapshot) => (
-                  <Box ref={provided.innerRef} minHeight={100}>
-                    {testing.map((row, i) => (
-                      <Draggable key={testing[i].id} draggableId={testing[i].id} index={i}>
-                        {(provided, snapshot) => (
-                          <Typography
-                            padding={2}
-                            variant="h6"
-                            fontFamily="Raleway"
-                            fontWeight={600}
-                            key={i}
-                            sx={{
-                              marginBottom: "10px",
-                              borderRadius: "10px",
-                              background: "linear-gradient(#cee9b6,#c1e6a1)",
-                              boxShadow: "0 4px 10px #cee9b6",
-                            }}
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            onClick={() =>
-                              handleOpenModal(
-                                testing[i].id,
-                                testing[i].title,
-                                testing[i].description,
-                                testing[i].assignee,
-                                testing[i].status
-                              )
-                            }
-                          >
-                            {testing[i].title.toUpperCase()}
-                          </Typography>
-                        )}
-                      </Draggable>
-                    ))}
-                  </Box>
-                )}
-              </Droppable>
+                <Droppable droppableId="testing">
+                  {(provided, snapshot) => (
+                    <Box ref={provided.innerRef} minHeight={100}>
+                      {testing.map((row, i) => (
+                        <Draggable key={testing[i].id} draggableId={testing[i].id} index={i}>
+                          {(provided, snapshot) => (
+                            <Typography
+                              padding={2}
+                              variant="h6"
+                              fontFamily="Raleway"
+                              fontWeight={600}
+                              key={i}
+                              sx={{
+                                marginBottom: "10px",
+                                borderRadius: "10px",
+                                background: "linear-gradient(#cee9b6,#c1e6a1)",
+                                boxShadow: "0 4px 10px #cee9b6",
+                              }}
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              onClick={() =>
+                                handleOpenModal(
+                                  testing[i].id,
+                                  testing[i].title,
+                                  testing[i].description,
+                                  testing[i].assignee,
+                                  testing[i].status
+                                )
+                              }
+                            >
+                              {testing[i].title.toUpperCase()}
+                            </Typography>
+                          )}
+                        </Draggable>
+                      ))}
+                    </Box>
+                  )}
+                </Droppable>
+              </Box>
+              <Box width={"100%"} padding={2}>
+                <Typography variant="h3" fontFamily="Raleway" fontWeight={600} marginBottom="10px">
+                  DONE
+                </Typography>
+                <Droppable droppableId="done">
+                  {(provided, snapshot) => (
+                    <Box ref={provided.innerRef} minHeight={100}>
+                      {done.map((row, i) => (
+                        <Draggable key={done[i].id} draggableId={done[i].id} index={i}>
+                          {(provided, snapshot) => (
+                            <Typography
+                              padding={2}
+                              variant="h6"
+                              fontFamily="Raleway"
+                              fontWeight={600}
+                              key={i}
+                              sx={{
+                                marginBottom: "10px",
+                                borderRadius: "10px",
+                                background: "linear-gradient(#bec4fa,#b1b8fa)",
+                                boxShadow: "0 4px 10px #bec4fa",
+                              }}
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              onClick={() =>
+                                handleOpenModal(
+                                  done[i].id,
+                                  done[i].title,
+                                  done[i].description,
+                                  done[i].assignee,
+                                  done[i].status
+                                )
+                              }
+                            >
+                              {done[i].title.toUpperCase()}
+                            </Typography>
+                          )}
+                        </Draggable>
+                      ))}
+                    </Box>
+                  )}
+                </Droppable>
+              </Box>
             </Box>
-            <Box width={"100%"} padding={2}>
-              <Typography variant="h3" fontFamily="Raleway" fontWeight={600} marginBottom="10px">
-                DONE
-              </Typography>
-              <Droppable droppableId="done">
-                {(provided, snapshot) => (
-                  <Box ref={provided.innerRef} minHeight={100}>
-                    {done.map((row, i) => (
-                      <Draggable key={done[i].id} draggableId={done[i].id} index={i}>
-                        {(provided, snapshot) => (
-                          <Typography
-                            padding={2}
-                            variant="h6"
-                            fontFamily="Raleway"
-                            fontWeight={600}
-                            key={i}
-                            sx={{
-                              marginBottom: "10px",
-                              borderRadius: "10px",
-                              background: "linear-gradient(#bec4fa,#b1b8fa)",
-                              boxShadow: "0 4px 10px #bec4fa",
-                            }}
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            onClick={() =>
-                              handleOpenModal(
-                                done[i].id,
-                                done[i].title,
-                                done[i].description,
-                                done[i].assignee,
-                                done[i].status
-                              )
-                            }
-                          >
-                            {done[i].title.toUpperCase()}
-                          </Typography>
-                        )}
-                      </Draggable>
-                    ))}
-                  </Box>
-                )}
-              </Droppable>
-            </Box>
-          </Box>
-        </DragDropContext>
+          </DragDropContext>
+        )}
       </MDBox>
       <Footer />
       <DetailModal
