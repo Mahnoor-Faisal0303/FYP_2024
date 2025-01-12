@@ -13,6 +13,7 @@ import ProjectDropdown from "./components/ProjectDropdown/ProjectDropdown";
 import { ProjectContext } from "../../providers/ProjectProvider";
 import AssigneeFilter from "./components/AssigneeFilter/AssigneeFilter";
 import SearchField from "./components/Search/Search";
+import Grid from "@mui/material/Grid";
 
 function TaskList() {
   const { defaultProject } = useContext(ProjectContext);
@@ -176,10 +177,20 @@ function TaskList() {
   return (
     <DashboardLayout>
       <DashboardNavbar absolute isMini />
-      <ProjectDropdown />
-      <AssigneeFilter onAssigneeChange={handleAssigneeChange} />
-      <SearchField onSearch={handleSearch} />
       <MDBox sx={{ marginBottom: "220px", marginTop: "40px" }}>
+      <Grid container spacing={3}>
+      <Grid item xs={12} md={6} lg={6}>
+      <SearchField onSearch={handleSearch} />
+        </Grid>
+        <Grid item xs={12} md={6} lg={3}>
+        <AssigneeFilter onAssigneeChange={handleAssigneeChange} />
+        </Grid>
+        <Grid item xs={12} md={6} lg={3}>
+        
+        <ProjectDropdown />
+        </Grid>
+        </Grid>
+      
         <DragDropContext onDragEnd={handleOnDragEnd}>
           <Box display={"flex"} flexDirection={"row"} sx={{ justifyContent: "space-between" }}>
             <Box width={"100%"} padding={2}>

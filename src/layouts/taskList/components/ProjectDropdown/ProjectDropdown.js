@@ -1,6 +1,7 @@
 
 import { ProjectContext } from "../../../../providers/ProjectProvider";
 import React, { useContext } from "react";
+import styles from "./dropdown.css";
 
 const ProjectDropdown = () => {
     const { projects, defaultProject, updateDefaultProject } = useContext(ProjectContext);
@@ -10,11 +11,11 @@ const ProjectDropdown = () => {
         updateDefaultProject(selectedProject);
     };
 
-    //   if (!projects.length) return <p>Loading projects...</p>;
+//    if (!projects.length) return <p>Loading projects...</p>;
 
     return (
         <div style={{ display: "flex", flexDirection: "column", margin: "10px 0" }}>
-            <label htmlFor="project-selector" style={{ marginBottom: "5px", fontWeight: "bold" }}>
+            <label htmlFor="project-selector" className="label">
                 Select Project:
             </label>
             <select

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
+import styles from "./assignee.css"
 
 const AssigneeFilter = ({ onAssigneeChange }) => {
     const [users, setUsers] = useState([]);
@@ -47,7 +48,7 @@ const AssigneeFilter = ({ onAssigneeChange }) => {
 
     return (
         <div style={{ display: "flex", flexDirection: "column", margin: "10px 0" }}>
-            <label htmlFor="assignee-selector" style={{ marginBottom: "5px", fontWeight: "bold" }}>
+            <label htmlFor="assignee-selector" className="label">
                 Filter By Assignee:
             </label>
             <select
@@ -61,7 +62,7 @@ const AssigneeFilter = ({ onAssigneeChange }) => {
                     border: "1px solid #ccc",
                 }}
             >
-                <option value="" disabled>Select an Assignee</option> {/* Default unselected option */}
+                {/* <option value="" disabled>Select an Assignee</option> Default unselected option */}
                 <option value="all">All</option> {/* Add "All" option */}
                 {users.map((user) => (
                     <option key={user.name} value={user.name}>

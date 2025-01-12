@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
+import styles from "./search.css";
 
 const SearchField = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -16,7 +17,7 @@ const SearchField = ({ onSearch }) => {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", margin: "10px 0" }}>
-      <label htmlFor="simple-search" style={{ marginBottom: "5px", fontWeight: "bold" }}>
+      <label htmlFor="simple-search" className="label">
         Search:
       </label>
       <input
@@ -38,7 +39,7 @@ const SearchField = ({ onSearch }) => {
 
 // PropTypes validation
 SearchField.propTypes = {
-  onSearch: PropTypes.func, // Callback for search input change
+  onSearch: PropTypes.func,
 };
 
 export default SearchField;
